@@ -540,9 +540,9 @@ export default function PokerTracker() {
   }, []);
 
   return (
-    <div className="relative flex justify-between w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="relative flex justify-between w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
       {/* Main App Content */}
-      <div className="w-full max-w-md bg-background">
+      <div className="w-full max-w-lg bg-background">
         {/* App Name */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
@@ -599,9 +599,9 @@ export default function PokerTracker() {
       </div>
 
       {/* Email Collection Card */}
-      <div className="fixed right-4 top-4 w-80 lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)]">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100">
-          <CardContent className="p-6 space-y-4">
+      <div className="fixed right-2 top-2 w-72 lg:right-6 xl:right-[calc((100vw-80rem)/2+1.5rem)]">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+          <CardContent className="p-4 space-y-3">
             <div className="text-center space-y-2">
               <h3 className="font-bold text-2xl text-blue-600">pokes.io</h3>
               <p className="text-blue-800 font-medium">Smart Poker Analytics</p>
