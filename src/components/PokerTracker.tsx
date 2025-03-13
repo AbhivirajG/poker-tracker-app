@@ -411,27 +411,27 @@ export default function PokerTracker() {
             </div>
             
             {/* Stats Cards */}
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-sm text-muted-foreground">Winnings</p>
                   <p className="text-lg font-bold text-green-500">${data.winnings.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-sm text-muted-foreground">Losses</p>
                   <p className="text-lg font-bold text-red-500">${data.losses.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-sm text-muted-foreground">Hours Played</p>
                   <p className="text-lg font-bold">{data.hoursPlayed} hrs</p>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-sm text-muted-foreground">Profit per Hour</p>
                   <p className={cn(
                     "text-lg font-bold",
@@ -540,66 +540,72 @@ export default function PokerTracker() {
   }, []);
 
   return (
-    <div className="relative flex justify-between w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+    <div className="relative flex justify-between w-full max-w-7xl mx-auto">
       {/* Main App Content */}
-      <div className="w-full max-w-lg bg-background">
-        {/* App Name */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
-          <p className="text-sm text-gray-500">Smart Poker Tracking</p>
-        </div>
-
-        {/* Header Navigation */}
-        <div className="flex justify-between items-center mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => changeView("prev")}
-            disabled={view === "Day"}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <span className="text-lg font-bold">{view}</span>
-          <Button 
-            variant="ghost" 
-            onClick={() => changeView("next")}
-            disabled={view === "Month"}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-        </div>
+      <div className="w-full max-w-[390px] min-h-[844px] mx-auto bg-background relative overflow-hidden rounded-[48px] border-[14px] border-black">
+        {/* Notch Area */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[160px] h-[34px] bg-black z-10 rounded-b-[20px]" />
         
-        {/* Segments */}
-        <div className="flex justify-around border-b pb-2 mb-6">
-          {segments.map((segment) => (
-            <button
-              key={segment}
-              onClick={() => setActiveSegment(segment)}
-              className={cn(
-                "font-medium px-4 py-2 relative",
-                activeSegment === segment && "text-primary"
-              )}
+        {/* Content Container - adjusted for notch */}
+        <div className="px-4 pt-12 pb-8 h-full">
+          {/* App Name */}
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
+            <p className="text-sm text-gray-500">Smart Poker Tracking</p>
+          </div>
+
+          {/* Header Navigation */}
+          <div className="flex justify-between items-center mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => changeView("prev")}
+              disabled={view === "Day"}
             >
-              {segment}
-              {activeSegment === segment && (
-                <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
-              )}
-            </button>
-          ))}
-        </div>
-        
-        {/* Add Session Button */}
-        <div className="text-center mb-4">
-          <Button onClick={addTestSession}>
-            Add Test Session
-          </Button>
-        </div>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <span className="text-lg font-bold">{view}</span>
+            <Button 
+              variant="ghost" 
+              onClick={() => changeView("next")}
+              disabled={view === "Month"}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+          
+          {/* Segments */}
+          <div className="flex justify-around border-b pb-2 mb-6">
+            {segments.map((segment) => (
+              <button
+                key={segment}
+                onClick={() => setActiveSegment(segment)}
+                className={cn(
+                  "font-medium px-4 py-2 relative",
+                  activeSegment === segment && "text-primary"
+                )}
+              >
+                {segment}
+                {activeSegment === segment && (
+                  <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
+                )}
+              </button>
+            ))}
+          </div>
+          
+          {/* Add Session Button */}
+          <div className="text-center mb-4">
+            <Button onClick={addTestSession}>
+              Add Test Session
+            </Button>
+          </div>
 
-        {/* Content */}
-        {renderContent()}
+          {/* Content */}
+          {renderContent()}
+        </div>
       </div>
 
-      {/* Email Collection Card */}
-      <div className="fixed right-2 top-2 w-72 lg:right-6 xl:right-[calc((100vw-80rem)/2+1.5rem)]">
+      {/* Email Collection Card - Adjusted positioning */}
+      <div className="fixed right-4 top-4 w-72 lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)] hidden lg:block">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
           <CardContent className="p-4 space-y-3">
             <div className="text-center space-y-2">
