@@ -1,51 +1,66 @@
-# Pokes.io - Smart Poker Tracking
+# Pokes.io - College Poker Analytics
 
-A modern web application for college poker players to track their games and improve their performance. Built with React, TypeScript, and Tailwind CSS.
+A modern poker tracking application designed for college students, helping them analyze their poker games and make better decisions.
 
 ## Features
 
-- Track poker session winnings, losses, and hours played
-- Visual performance tracking with interactive charts
-- Financial goal setting and tracking
-- Opportunity cost analysis
-- Session history with detailed statistics
-- Modern, responsive design optimized for mobile
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/[your-username]/poker-tracker-app.git
-```
-
-2. Install dependencies:
-```bash
-cd poker-tracker-app
-npm install
-```
-
-3. Start the development server:
-```bash
-npm start
-```
-
-The application will open in your default browser at `http://localhost:3000`.
+- 📊 Session tracking and analytics
+- 💰 Profit/loss visualization
+- ⏱️ Time management insights
+- 💡 Opportunity cost analysis
+- 🎯 Goal setting and tracking
 
 ## Tech Stack
 
 - React
 - TypeScript
 - Tailwind CSS
-- Recharts
-- Shadcn/ui Components
+- Supabase (for email collection)
+- Recharts (for data visualization)
+
+## Getting Started
+
+1. Clone the repository:
+```bash
+git clone [your-repo-url]
+cd poker-tracker-app
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+Create a `.env` file in the root directory and add your Supabase credentials:
+```
+REACT_APP_SUPABASE_URL=your_supabase_url
+REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+4. Start the development server:
+```bash
+# For Node.js >= 17
+export NODE_OPTIONS='--openssl-legacy-provider' && npm start
+
+# For Node.js < 17
+npm start
+```
+
+## Development Notes
+
+- The app uses Node.js with OpenSSL legacy provider for compatibility
+- Default port is 3000, but can be configured using the PORT environment variable
+- Supports modern browsers and mobile devices
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License - feel free to use this code for your own projects!
+This project is licensed under the MIT License - see the LICENSE file for details.
