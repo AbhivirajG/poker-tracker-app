@@ -1,12 +1,9 @@
-import React from 'react';
-import IPhoneFrame from './components/iPhoneFrame';
+import LandingPage from './components/LandingPage';
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <IPhoneFrame />
-    </div>
+    <LandingPage />
   );
-};
+}
 
 export default App;

@@ -181,476 +181,406 @@ export default function PokerTracker() {
     ? ((netProfit / (data.winnings + data.losses)) * 100).toFixed(1)
     : "0";
 
-  const renderContent = () => {
-    switch (activeSegment) {
-      case "Session":
-        return (
-          <div className="space-y-6">
-            <div className="h-[400px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={sessionHistory}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date"
-                    tickFormatter={(value) => value.split('/')[1]} // Show only day
-                  />
-                  <YAxis />
-                  <Tooltip
-                    formatter={(value: number) => [`$${value.toFixed(2)}`, "Balance"]}
-                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px' }}
-                    labelStyle={{ color: '#666' }}
-                  />
-                  {/* Positive values */}
-                  <Area
-                    type="monotone"
-                    dataKey="cumulative"
-                    stroke="#2563eb"
-                    fill="url(#colorPositive)"
-                    fillOpacity={1}
-                    name="Balance"
-                    // @ts-ignore
-                    stackId="1"
-                    isAnimationActive={true}
-                    connectNulls
-                  />
-                  {/* Negative values */}
-                  <Area
-                    type="monotone"
-                    dataKey="cumulative"
-                    stroke="#dc2626"
-                    fill="url(#colorNegative)"
-                    fillOpacity={1}
-                    // @ts-ignore
-                    stackId="2"
-                    isAnimationActive={true}
-                    connectNulls
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Session History List */}
-            <div className="space-y-2">
-              <h3 className="font-semibold text-lg">Session History</h3>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {sessionHistory.slice().reverse().map((session, index) => (
-                  <div 
-                    key={index}
-                    className={cn(
-                      "p-3 rounded-lg border",
-                      session.amount > 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
-                    )}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{session.date}</span>
-                      <span 
-                        className={cn(
-                          "font-medium",
-                          session.amount > 0 ? "text-green-600" : "text-red-600"
-                        )}
-                      >
-                        {session.amount > 0 ? "+" : ""}{session.amount.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      Total: <span className={cn(
-                        session.cumulative > 0 ? "text-green-600" : "text-red-600"
-                      )}>${session.cumulative.toFixed(2)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case "Cost":
-        const opportunityCost = calculateOpportunityCost();
-        return (
-          <div className="space-y-6">
-            {/* Goals Section */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Financial Goals</h3>
-              
-              {/* Add New Goal */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Goal name (e.g., New Jacket)"
-                  value={newGoal.name}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, name: e.target.value }))}
-                  className="flex-1 px-3 py-2 border rounded-lg"
-                />
-                <input
-                  type="number"
-                  placeholder="Cost ($)"
-                  value={newGoal.cost}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, cost: e.target.value }))}
-                  className="w-24 px-3 py-2 border rounded-lg"
-                />
-                <Button onClick={addGoal} className="px-3">
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
-
-              {/* Goals List */}
-              <div className="space-y-2">
-                {goals.map(goal => (
-                  <div
-                    key={goal.id}
-                    className={cn(
-                      "p-3 rounded-lg border flex items-center justify-between",
-                      goal.achieved ? "bg-green-50 border-green-200" : "bg-white"
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={goal.achieved}
-                        onChange={() => toggleGoalAchieved(goal.id)}
-                        className="h-4 w-4"
-                      />
-                      <div>
-                        <p className="font-medium">{goal.name}</p>
-                        <p className="text-sm text-gray-500">${goal.cost.toFixed(2)}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeGoal(goal.id)}
-                      className="text-gray-400 hover:text-red-500"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Opportunity Cost Analysis */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Opportunity Cost Analysis</h3>
-              <p className="text-sm text-gray-500">
-                Based on {data.hoursPlayed} hours played
-              </p>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Poker Earnings</span>
-                      <span className={cn(
-                        "font-medium",
-                        opportunityCost.poker > 0 ? "text-green-500" : "text-red-500"
-                      )}>
-                        ${opportunityCost.poker.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Minimum Wage Job</span>
-                      <span className="font-medium">${opportunityCost.minimumWage.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Software Development</span>
-                      <span className="font-medium">${opportunityCost.softwareDev.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Finance Industry</span>
-                      <span className="font-medium">${opportunityCost.finance.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Time to Goal Analysis */}
-              {goals.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium">Time to Reach Goals</h4>
-                  {goals.filter(g => !g.achieved).map(goal => {
-                    const hoursNeeded = data.profitPerHour > 0 
-                      ? (goal.cost / data.profitPerHour).toFixed(1)
-                      : "∞";
-                    return (
-                      <div key={goal.id} className="flex justify-between items-center text-sm">
-                        <span>{goal.name}</span>
-                        <span>{hoursNeeded} hours needed</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      default:
-        return (
-          <>
-            {/* Circular Progress */}
-            <div className="flex justify-center my-8">
-              <div className="relative w-48 h-48">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-40 h-40 rounded-full border-8 border-muted flex items-center justify-center">
-                    <div className="text-center">
-                      <span className="text-2xl font-bold block">{profitPercentage}%</span>
-                      <span className="text-sm text-muted-foreground">Profit Rate</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-3">
-              <Card>
-                <CardContent className="p-3">
-                  <p className="text-sm text-muted-foreground">Winnings</p>
-                  <p className="text-lg font-bold text-green-500">${data.winnings.toFixed(2)}</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-3">
-                  <p className="text-sm text-muted-foreground">Losses</p>
-                  <p className="text-lg font-bold text-red-500">${data.losses.toFixed(2)}</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-3">
-                  <p className="text-sm text-muted-foreground">Hours Played</p>
-                  <p className="text-lg font-bold">{data.hoursPlayed} hrs</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-3">
-                  <p className="text-sm text-muted-foreground">Profit per Hour</p>
-                  <p className={cn(
-                    "text-lg font-bold",
-                    data.profitPerHour > 0 ? "text-green-500" : "text-red-500"
-                  )}>
-                    ${data.profitPerHour.toFixed(2)}/hr
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        );
-    }
-  };
-
-  // Update email submission
-  const handleEmailSubmit = async () => {
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      alert('Please enter an email address');
-      return;
-    }
-    if (!emailRegex.test(email)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('emails')
-        .insert([
-          { 
-            email,
-            timestamp: new Date().toISOString()
-          }
-        ]);
-
-      if (error) {
-        if (error.code === '23505') { // Unique violation
-          alert('This email is already registered');
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      setIsSubmitted(true);
-      setEmail("");
-
-      // Refresh email list
-      const { data } = await supabase
-        .from('emails')
-        .select('*')
-        .order('timestamp', { ascending: false });
-
-      if (data) {
-        setEmailList((data as DatabaseEmail[]).map((item: DatabaseEmail) => ({
-          email: item.email,
-          timestamp: new Date(item.timestamp).toLocaleString()
-        })));
-      }
-    } catch (error) {
-      console.error('Error submitting email:', error);
-      alert('Failed to submit email. Please try again.');
-    }
-  };
-
-  // Update CSV download
-  const downloadEmails = () => {
-    const emailData = emailList.map(sub => `${sub.email},${sub.timestamp}`).join('\n');
-    const blob = new Blob([`Email,Timestamp\n${emailData}`], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pokes_io_emails.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
-
-  // Secret admin panel toggle (press 'a' key three times quickly)
-  useEffect(() => {
-    let clicks = 0;
-    let lastClick = 0;
-    
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'a') {
-        const now = Date.now();
-        if (now - lastClick < 500) { // 500ms between clicks
-          clicks++;
-          if (clicks === 3) {
-            setShowAdmin(prev => !prev);
-            clicks = 0;
-          }
-        } else {
-          clicks = 1;
-        }
-        lastClick = now;
-      }
-    };
-
-    window.addEventListener('keypress', handleKeyPress);
-    return () => window.removeEventListener('keypress', handleKeyPress);
-  }, []);
+  const opportunityCost = calculateOpportunityCost();
 
   return (
-    <div className="flex justify-between items-start w-full max-w-7xl mx-auto p-6 gap-8">
-      {/* Main App Content */}
-      <div className="flex-1 max-w-3xl bg-white rounded-xl shadow-sm border p-6">
-        {/* App Name */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
-          <p className="text-sm text-gray-500">Smart Poker Tracking</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="flex gap-8 max-w-[1200px] w-full items-start justify-between">
+        {/* Main App Content */}
+        <div className="flex-1 bg-white rounded-lg shadow-sm p-6">
+          {/* App Name */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
+            <p className="text-sm text-gray-500">Smart Poker Tracking</p>
+          </div>
 
-        {/* Header Navigation */}
-        <div className="flex justify-between items-center mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => changeView("prev")}
-            disabled={view === "Day"}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <span className="text-lg font-bold">{view}</span>
-          <Button 
-            variant="ghost" 
-            onClick={() => changeView("next")}
-            disabled={view === "Month"}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {/* Segments */}
-        <div className="flex justify-around border-b pb-2 mb-6">
-          {segments.map((segment) => (
-            <button
-              key={segment}
-              onClick={() => setActiveSegment(segment)}
-              className={cn(
-                "font-medium px-4 py-2 relative",
-                activeSegment === segment && "text-primary"
-              )}
-            >
-              {segment}
-              {activeSegment === segment && (
-                <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
-              )}
-            </button>
-          ))}
-        </div>
-        
-        {/* Add Session Button */}
-        <div className="text-center mb-4">
-          <Button onClick={addTestSession}>
-            Add Test Session
-          </Button>
-        </div>
+          {/* Add Session Button - Always visible */}
+          <div className="mb-6">
+            <Button onClick={addTestSession} className="w-full py-3 text-lg">
+              Add Test Session
+            </Button>
+          </div>
 
-        {/* Content */}
-        {renderContent()}
-      </div>
+          {/* Navigation */}
+          <div className="flex justify-around border-b pb-2 mb-6">
+            {segments.map((segment) => (
+              <button
+                key={segment}
+                onClick={() => setActiveSegment(segment)}
+                className={cn(
+                  "font-medium px-4 py-2 relative",
+                  activeSegment === segment && "text-primary"
+                )}
+              >
+                {segment}
+                {activeSegment === segment && (
+                  <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
+                )}
+              </button>
+            ))}
+          </div>
 
-      {/* Email Collection Card - Fixed on right side */}
-      <div className="w-80 sticky top-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-          <CardContent className="p-6 space-y-4">
-            <div className="text-center space-y-2">
-              <h3 className="font-bold text-2xl text-blue-600">pokes.io</h3>
-              <p className="text-blue-800 font-medium">Smart Poker Analytics</p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium text-gray-900">🎯 Track Your Progress</p>
-                <p className="text-gray-600">Monitor your wins, improve your game.</p>
-              </div>
-
-              <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium text-gray-900">💰 Affordable</p>
-                <p className="text-gray-600">Just $10/month - less than a buy-in!</p>
-              </div>
-
-              <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium text-gray-900">🚀 Limited Beta</p>
-                <p className="text-gray-600">Early access spots available now.</p>
-              </div>
-            </div>
-
-            {!isSubmitted ? (
-              <div className="space-y-3">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <input
-                    type="email"
-                    placeholder="your.email@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  />
+          {/* Content Sections */}
+          <div className="overflow-y-auto">
+            {activeSegment === "Overview" && (
+              <div className="space-y-6">
+                {/* Profit Rate Circle */}
+                <div className="flex justify-center mb-8">
+                  <div className="relative w-48 h-48">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-40 h-40 rounded-full border-8 border-muted flex items-center justify-center">
+                        <div className="text-center">
+                          <span className="text-3xl font-bold block">{profitPercentage}%</span>
+                          <span className="text-sm text-muted-foreground">Profit Rate</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Button 
-                  onClick={handleEmailSubmit}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Join Beta Access
-                </Button>
-              </div>
-            ) : (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                <p className="text-green-800 font-medium">Welcome to pokes.io! 🎉</p>
-                <p className="text-green-600 text-sm">We'll be in touch soon.</p>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm text-muted-foreground">Winnings</p>
+                      <p className="text-xl font-bold text-green-500">${data.winnings.toFixed(2)}</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm text-muted-foreground">Losses</p>
+                      <p className="text-xl font-bold text-red-500">${data.losses.toFixed(2)}</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm text-muted-foreground">Hours Played</p>
+                      <p className="text-xl font-bold">{data.hoursPlayed} hrs</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm text-muted-foreground">Profit per Hour</p>
+                      <p className={cn(
+                        "text-xl font-bold",
+                        data.profitPerHour > 0 ? "text-green-500" : "text-red-500"
+                      )}>
+                        ${data.profitPerHour.toFixed(2)}/hr
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+
+            {activeSegment === "Session" && (
+              <div className="space-y-6">
+                {/* Session Graph */}
+                <div className="h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={sessionHistory}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date"
+                        tickFormatter={(value) => value.split('/')[1]}
+                      />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value: number) => [`$${value.toFixed(2)}`, "Balance"]}
+                        contentStyle={{ backgroundColor: 'white', borderRadius: '8px' }}
+                        labelStyle={{ color: '#666' }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="cumulative"
+                        stroke="#2563eb"
+                        fill="url(#colorPositive)"
+                        fillOpacity={1}
+                        name="Balance"
+                        stackId="1"
+                        isAnimationActive={true}
+                        connectNulls
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Session History */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg">Session History</h3>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    {sessionHistory.slice().reverse().map((session, index) => (
+                      <div 
+                        key={index}
+                        className={cn(
+                          "p-4 rounded-lg border",
+                          session.amount > 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                        )}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">{session.date}</span>
+                          <span 
+                            className={cn(
+                              "font-medium",
+                              session.amount > 0 ? "text-green-600" : "text-red-600"
+                            )}
+                          >
+                            {session.amount > 0 ? "+" : ""}{session.amount.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSegment === "Cost" && (
+              <div className="space-y-4">
+                {/* Opportunity Cost Analysis */}
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-blue-600">Opportunity Cost Analysis</h3>
+                  
+                  {/* Main Earnings Card */}
+                  <Card className={cn(
+                    "border border-gray-200",
+                    opportunityCost.poker > opportunityCost.minimumWage ? "bg-green-50" : "bg-red-50"
+                  )}>
+                    <CardContent className="p-3">
+                      <h4 className="font-medium">Your Poker Earnings</h4>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className={cn(
+                          "text-xl font-bold",
+                          opportunityCost.poker > 0 ? "text-green-600" : "text-red-600"
+                        )}>
+                          ${opportunityCost.poker.toFixed(2)}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          (${data.profitPerHour.toFixed(2)}/hr)
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Comparison Cards */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Card className="border border-gray-200">
+                      <CardContent className="p-3">
+                        <h4 className="font-medium text-sm">Minimum Wage</h4>
+                        <div className="flex justify-between items-baseline mt-1">
+                          <span className="text-sm text-gray-500">${MINIMUM_WAGE}/hr</span>
+                          <span className="font-medium">
+                            ${opportunityCost.minimumWage.toFixed(2)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border border-gray-200">
+                      <CardContent className="p-3">
+                        <h4 className="font-medium text-sm">Software Dev</h4>
+                        <div className="flex justify-between items-baseline mt-1">
+                          <span className="text-sm text-gray-500">${AVERAGE_SOFTWARE_DEV_WAGE}/hr</span>
+                          <span className="font-medium">
+                            ${opportunityCost.softwareDev.toFixed(2)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Goals Section */}
+                <div className="space-y-3 mt-6">
+                  <h3 className="text-lg font-semibold text-blue-600">Financial Goals</h3>
+                  
+                  {/* Add New Goal */}
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="What's your goal? (e.g., New MacBook)"
+                      value={newGoal.name}
+                      onChange={(e) => setNewGoal(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Cost ($)"
+                        value={newGoal.cost}
+                        onChange={(e) => setNewGoal(prev => ({ ...prev, cost: e.target.value }))}
+                        className="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                      <Button onClick={addGoal} className="px-4 py-2 text-sm">
+                        Add Goal
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Goals List */}
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    {goals.map(goal => {
+                      const hoursNeeded = data.profitPerHour > 0 
+                        ? goal.cost / data.profitPerHour 
+                        : Infinity;
+                      const daysNeeded = Math.ceil(hoursNeeded / 8);
+                      
+                      return (
+                        <Card
+                          key={goal.id}
+                          className="border border-gray-200"
+                        >
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={goal.achieved}
+                                onChange={() => toggleGoalAchieved(goal.id)}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start">
+                                  <h4 className="font-medium text-sm truncate">{goal.name}</h4>
+                                  <button
+                                    onClick={() => removeGoal(goal.id)}
+                                    className="text-gray-400 hover:text-red-500 p-0.5 -mt-1 -mr-1"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                  Target: ${goal.cost.toFixed(2)} • 
+                                  {hoursNeeded === Infinity ? (
+                                    " ∞ hours"
+                                  ) : (
+                                    ` ~${hoursNeeded.toFixed(1)}h (${daysNeeded}d)`
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                    {goals.length === 0 && (
+                      <div className="text-center py-4 text-gray-500">
+                        <p className="text-sm">No goals added yet</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Email Collection Card - Right Side */}
+        <div className="w-[400px] sticky top-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+            <CardContent className="p-6 space-y-6">
+              <div className="text-center space-y-2">
+                <h3 className="font-bold text-3xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">pokes.io</h3>
+                <p className="text-blue-800 font-medium">Level Up Your College Poker Game</p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
+                  <p className="font-medium text-gray-900">🎓 Made for College Players</p>
+                  <p className="text-gray-600">Track your dorm games, analyze your plays, crush your friends.</p>
+                </div>
+
+                <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
+                  <p className="font-medium text-gray-900">💰 Student Budget</p>
+                  <p className="text-gray-600">Just one buy-in ($10/month) for pro-level analytics.</p>
+                </div>
+
+                <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
+                  <p className="font-medium text-gray-900">📈 Track Everything</p>
+                  <p className="text-gray-600">Sessions, profits, goals, and opportunity costs.</p>
+                </div>
+
+                <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
+                  <p className="font-medium text-gray-900">🎲 Early Access Perks</p>
+                  <p className="text-gray-600">3 months free + exclusive features for beta users.</p>
+                </div>
+              </div>
+
+              {!isSubmitted ? (
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      type="email"
+                      placeholder="your.college@edu"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base"
+                    />
+                  </div>
+                  <Button 
+                    onClick={async () => {
+                      if (!email) return;
+                      try {
+                        const { error } = await supabase
+                          .from('emails')
+                          .insert([
+                            { 
+                              email: email,
+                              timestamp: new Date().toISOString()
+                            }
+                          ]);
+                        
+                        if (error) throw error;
+                        setIsSubmitted(true);
+                        // Refresh email list for admin
+                        const { data, error: fetchError } = await supabase
+                          .from('emails')
+                          .select('*')
+                          .order('timestamp', { ascending: false });
+                        
+                        if (!fetchError && data) {
+                          setEmailList(data.map(item => ({
+                            email: item.email,
+                            timestamp: new Date(item.timestamp).toLocaleString()
+                          })));
+                        }
+                      } catch (error) {
+                        console.error('Error submitting email:', error);
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 text-lg font-medium rounded-lg transform hover:scale-105 transition-all"
+                  >
+                    Join the Beta 🎲
+                  </Button>
+                  <div className="text-center space-y-2">
+                    <p className="text-sm font-medium text-blue-800">Limited Time Offer</p>
+                    <p className="text-xs text-gray-500">Get 3 months free access when we launch!</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6 text-center space-y-3">
+                  <div className="text-5xl">🎉</div>
+                  <p className="text-green-800 font-medium text-lg">You're In!</p>
+                  <p className="text-green-700">Welcome to the pokes.io beta family.</p>
+                  <p className="text-sm text-green-600">Check your email for exclusive access!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Admin Panel */}
@@ -661,8 +591,9 @@ export default function PokerTracker() {
               <div className="flex justify-between items-center">
                 <h3 className="font-bold text-xl">Admin Panel - Collected Emails</h3>
                 <div className="space-x-2">
-                  <Button onClick={downloadEmails} className="bg-green-600 hover:bg-green-700">
-                    <Download className="h-4 w-4 mr-2" />
+                  <Button onClick={() => {
+                    // Placeholder for exporting emails
+                  }} className="bg-green-600 hover:bg-green-700">
                     Export CSV
                   </Button>
                   <Button onClick={() => setShowAdmin(false)} variant="ghost">
