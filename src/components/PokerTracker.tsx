@@ -540,9 +540,9 @@ export default function PokerTracker() {
   }, []);
 
   return (
-    <div className="relative flex justify-between w-full max-w-7xl mx-auto">
+    <div className="flex justify-center items-center min-h-screen bg-white">
       {/* Main App Content */}
-      <div className="w-full max-w-[390px] min-h-[844px] mx-auto bg-background relative overflow-hidden rounded-[48px] border-[14px] border-black">
+      <div className="w-[390px] min-h-[844px] bg-white relative overflow-hidden rounded-[48px] border-[14px] border-black">
         {/* Notch Area */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[160px] h-[34px] bg-black z-10 rounded-b-[20px]" />
         
@@ -604,8 +604,8 @@ export default function PokerTracker() {
         </div>
       </div>
 
-      {/* Email Collection Card - Adjusted positioning */}
-      <div className="fixed right-4 top-4 w-72 lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)] hidden lg:block">
+      {/* Email Collection Card - Move to bottom of screen on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 lg:p-0 lg:static lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)] lg:w-72">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
           <CardContent className="p-4 space-y-3">
             <div className="text-center space-y-2">
