@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { supabase } from '../lib/supabase';
 
 type ViewType = "Day" | "Week" | "Month";
 type SegmentType = "Overview" | "Session" | "Cost";
@@ -33,6 +34,17 @@ const MINIMUM_WAGE = 15; // per hour
 const AVERAGE_SOFTWARE_DEV_WAGE = 50; // per hour
 const AVERAGE_FINANCE_WAGE = 40; // per hour
 
+interface DatabaseEmail {
+  email: string;
+  timestamp: string;
+  id: string;
+}
+
+interface EmailRecord {
+  email: string;
+  timestamp: string;
+}
+
 interface EmailSubmission {
   email: string;
   timestamp: string;
@@ -55,12 +67,27 @@ export default function PokerTracker() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [emailList, setEmailList] = useState<EmailSubmission[]>([]);
 
-  // Load emails from localStorage on component mount
+  // Update email list fetching
   useEffect(() => {
-    const savedEmails = localStorage.getItem('pokes_io_emails');
-    if (savedEmails) {
-      setEmailList(JSON.parse(savedEmails));
-    }
+    const fetchEmails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('emails')
+          .select('*')
+          .order('timestamp', { ascending: false });
+
+        if (error) throw error;
+
+        setEmailList((data as DatabaseEmail[]).map((item: DatabaseEmail) => ({
+          email: item.email,
+          timestamp: new Date(item.timestamp).toLocaleString()
+        })));
+      } catch (error) {
+        console.error('Error fetching emails:', error);
+      }
+    };
+
+    fetchEmails();
   }, []);
 
   const changeView = (direction: "prev" | "next") => {
@@ -420,25 +447,60 @@ export default function PokerTracker() {
     }
   };
 
-  const handleEmailSubmit = () => {
-    if (email && email.includes('@')) {
-      const newSubmission = {
-        email,
-        timestamp: new Date().toLocaleString()
-      };
+  // Update email submission
+  const handleEmailSubmit = async () => {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      alert('Please enter an email address');
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
 
-      // Update state and localStorage
-      setEmailList(prev => {
-        const updated = [...prev, newSubmission];
-        localStorage.setItem('pokes_io_emails', JSON.stringify(updated));
-        return updated;
-      });
+    try {
+      const { error } = await supabase
+        .from('emails')
+        .insert([
+          { 
+            email,
+            timestamp: new Date().toISOString()
+          }
+        ]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique violation
+          alert('This email is already registered');
+        } else {
+          throw error;
+        }
+        return;
+      }
 
       setIsSubmitted(true);
       setEmail("");
+
+      // Refresh email list
+      const { data } = await supabase
+        .from('emails')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      if (data) {
+        setEmailList((data as DatabaseEmail[]).map((item: DatabaseEmail) => ({
+          email: item.email,
+          timestamp: new Date(item.timestamp).toLocaleString()
+        })));
+      }
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      alert('Failed to submit email. Please try again.');
     }
   };
 
+  // Update CSV download
   const downloadEmails = () => {
     const emailData = emailList.map(sub => `${sub.email},${sub.timestamp}`).join('\n');
     const blob = new Blob([`Email,Timestamp\n${emailData}`], { type: 'text/csv' });
@@ -460,7 +522,7 @@ export default function PokerTracker() {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'a') {
         const now = Date.now();
-        if (now - lastClick < 500) {
+        if (now - lastClick < 500) { // 500ms between clicks
           clicks++;
           if (clicks === 3) {
             setShowAdmin(prev => !prev);
@@ -542,18 +604,18 @@ export default function PokerTracker() {
           <CardContent className="p-6 space-y-4">
             <div className="text-center space-y-2">
               <h3 className="font-bold text-2xl text-blue-600">pokes.io</h3>
-              <p className="text-blue-800 font-medium">College Poker Analytics</p>
+              <p className="text-blue-800 font-medium">Smart Poker Analytics</p>
             </div>
 
             <div className="space-y-3">
               <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium text-gray-900">🎯 For College Players</p>
-                <p className="text-gray-600">Track your games, improve your wins.</p>
+                <p className="font-medium text-gray-900">🎯 Track Your Progress</p>
+                <p className="text-gray-600">Monitor your wins, improve your game.</p>
               </div>
 
               <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium text-gray-900">💰 Student Deal</p>
-                <p className="text-gray-600">$10/semester - cheaper than a buy-in!</p>
+                <p className="font-medium text-gray-900">💰 Affordable</p>
+                <p className="text-gray-600">Just $10/month - less than a buy-in!</p>
               </div>
 
               <div className="bg-white/80 rounded-lg p-3 text-sm space-y-2">
