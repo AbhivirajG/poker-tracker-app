@@ -540,9 +540,9 @@ export default function PokerTracker() {
   }, []);
 
   return (
-    <div className="relative flex justify-between max-w-6xl mx-auto">
+    <div className="relative flex justify-between w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Main App Content */}
-      <div className="p-4 w-full max-w-md bg-background">
+      <div className="w-full max-w-md bg-background">
         {/* App Name */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
@@ -599,7 +599,7 @@ export default function PokerTracker() {
       </div>
 
       {/* Email Collection Card */}
-      <div className="fixed right-4 top-4 w-80">
+      <div className="fixed right-4 top-4 w-80 lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)]">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100">
           <CardContent className="p-6 space-y-4">
             <div className="text-center space-y-2">
@@ -655,8 +655,8 @@ export default function PokerTracker() {
 
       {/* Admin Panel */}
       {showAdmin && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-[600px] max-h-[80vh] overflow-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl max-h-[80vh] overflow-auto">
             <CardContent className="p-6 space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-bold text-xl">Admin Panel - Collected Emails</h3>
