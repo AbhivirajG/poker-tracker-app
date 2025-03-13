@@ -540,74 +540,68 @@ export default function PokerTracker() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white">
+    <div className="flex justify-between items-start w-full max-w-7xl mx-auto p-6 gap-8">
       {/* Main App Content */}
-      <div className="w-[390px] min-h-[844px] bg-white relative overflow-hidden rounded-[48px] border-[14px] border-black">
-        {/* Notch Area */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[160px] h-[34px] bg-black z-10 rounded-b-[20px]" />
-        
-        {/* Content Container - adjusted for notch */}
-        <div className="px-4 pt-12 pb-8 h-full">
-          {/* App Name */}
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
-            <p className="text-sm text-gray-500">Smart Poker Tracking</p>
-          </div>
-
-          {/* Header Navigation */}
-          <div className="flex justify-between items-center mb-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => changeView("prev")}
-              disabled={view === "Day"}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <span className="text-lg font-bold">{view}</span>
-            <Button 
-              variant="ghost" 
-              onClick={() => changeView("next")}
-              disabled={view === "Month"}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          {/* Segments */}
-          <div className="flex justify-around border-b pb-2 mb-6">
-            {segments.map((segment) => (
-              <button
-                key={segment}
-                onClick={() => setActiveSegment(segment)}
-                className={cn(
-                  "font-medium px-4 py-2 relative",
-                  activeSegment === segment && "text-primary"
-                )}
-              >
-                {segment}
-                {activeSegment === segment && (
-                  <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
-                )}
-              </button>
-            ))}
-          </div>
-          
-          {/* Add Session Button */}
-          <div className="text-center mb-4">
-            <Button onClick={addTestSession}>
-              Add Test Session
-            </Button>
-          </div>
-
-          {/* Content */}
-          {renderContent()}
+      <div className="flex-1 max-w-3xl bg-white rounded-xl shadow-sm border p-6">
+        {/* App Name */}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-blue-600">pokes.io</h2>
+          <p className="text-sm text-gray-500">Smart Poker Tracking</p>
         </div>
+
+        {/* Header Navigation */}
+        <div className="flex justify-between items-center mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => changeView("prev")}
+            disabled={view === "Day"}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <span className="text-lg font-bold">{view}</span>
+          <Button 
+            variant="ghost" 
+            onClick={() => changeView("next")}
+            disabled={view === "Month"}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        {/* Segments */}
+        <div className="flex justify-around border-b pb-2 mb-6">
+          {segments.map((segment) => (
+            <button
+              key={segment}
+              onClick={() => setActiveSegment(segment)}
+              className={cn(
+                "font-medium px-4 py-2 relative",
+                activeSegment === segment && "text-primary"
+              )}
+            >
+              {segment}
+              {activeSegment === segment && (
+                <div className="absolute bottom-[-9px] left-0 w-full h-[2px] bg-primary" />
+              )}
+            </button>
+          ))}
+        </div>
+        
+        {/* Add Session Button */}
+        <div className="text-center mb-4">
+          <Button onClick={addTestSession}>
+            Add Test Session
+          </Button>
+        </div>
+
+        {/* Content */}
+        {renderContent()}
       </div>
 
-      {/* Email Collection Card - Move to bottom of screen on mobile */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 lg:p-0 lg:static lg:right-8 xl:right-[calc((100vw-80rem)/2+2rem)] lg:w-72">
+      {/* Email Collection Card - Fixed on right side */}
+      <div className="w-80 sticky top-6">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-          <CardContent className="p-4 space-y-3">
+          <CardContent className="p-6 space-y-4">
             <div className="text-center space-y-2">
               <h3 className="font-bold text-2xl text-blue-600">pokes.io</h3>
               <p className="text-blue-800 font-medium">Smart Poker Analytics</p>
