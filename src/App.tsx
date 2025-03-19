@@ -1,8 +1,11 @@
-import LandingPage from './components/LandingPage';
+import React from 'react';
+import PokerTracker from './components/PokerTracker';
 
 function App() {
   return (
-    <LandingPage />
+    <div className="min-h-screen bg-gray-100">
+      <PokerTracker />
+    </div>
   );
 }
 
