@@ -3,11 +3,32 @@ import PokerTracker from './components/PokerTracker';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* Announcement Banner */}
+      {showBanner && (
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center text-sm font-medium flex items-center justify-center">
+              <span className="animate-pulse mr-2">🔥</span>
+              <span>Join 500+ college students already using pokes.io</span>
+              <span className="mx-2">•</span>
+              <span className="hidden sm:inline">Get 3 months free during beta!</span>
+              <button 
+                onClick={() => setShowBanner(false)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/80 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-sm fixed w-full z-50 shadow-sm">
+      <nav className={`bg-white/80 backdrop-blur-sm fixed w-full z-50 shadow-sm ${showBanner ? 'top-8' : 'top-0'} transition-all duration-300`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo and Brand */}
@@ -93,7 +114,7 @@ function App() {
       </nav>
 
       {/* Hero Section with Enhanced Header */}
-      <div className="pt-32 pb-16 px-4 relative overflow-hidden">
+      <div className={`${showBanner ? 'pt-40' : 'pt-32'} pb-16 px-4 relative overflow-hidden transition-all duration-300`}>
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 z-0"></div>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#3b82f6_0%,_transparent_60%)] opacity-10"></div>
@@ -116,18 +137,51 @@ function App() {
             Track your games, analyze your plays, and crush your dorm room competition with pro-level analytics.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
-            <button className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+            <button className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 group">
               <span>Get Started Free</span>
-              <span className="text-xl">→</span>
+              <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
             </button>
             <button className="w-full sm:w-auto border border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center space-x-2">
               <span>Watch Demo</span>
               <span className="text-xl">▶</span>
             </button>
           </div>
-          <div className="mt-8 flex justify-center space-x-4 text-sm text-gray-500">
-            <span className="flex items-center">✓ No credit card required</span>
-            <span className="flex items-center">✓ 3 months free trial</span>
+          <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8">
+            <div className="flex items-center space-x-4">
+              <span className="flex items-center text-sm text-gray-500">✓ No credit card required</span>
+              <span className="flex items-center text-sm text-gray-500">✓ 3 months free trial</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs">👨‍🎓</div>
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs">👩‍🎓</div>
+                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xs">🎓</div>
+              </div>
+              <span className="text-sm text-gray-500">Join 500+ college players</span>
+            </div>
+          </div>
+          {/* Trust Badges */}
+          <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+              <div className="text-2xl mb-1">🏆</div>
+              <div className="text-sm font-medium">10,000+</div>
+              <div className="text-xs text-gray-500">Games Tracked</div>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+              <div className="text-2xl mb-1">📈</div>
+              <div className="text-sm font-medium">85%</div>
+              <div className="text-xs text-gray-500">Win Rate Increase</div>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+              <div className="text-2xl mb-1">🎯</div>
+              <div className="text-sm font-medium">50+</div>
+              <div className="text-xs text-gray-500">Universities</div>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+              <div className="text-2xl mb-1">⭐</div>
+              <div className="text-sm font-medium">4.9/5</div>
+              <div className="text-xs text-gray-500">User Rating</div>
+            </div>
           </div>
         </div>
       </div>
