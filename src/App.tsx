@@ -6,8 +6,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Simple Header */}
-      <header className="bg-white border-b border-gray-100">
+      {/* Navigation */}
+      <nav className="bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between h-16 items-center">
             <span className="text-xl font-medium text-gray-900">pokes.io</span>
@@ -44,56 +44,79 @@ function App() {
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <main>
-        {/* Demo Section - The Heart of the App */}
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Context Banner */}
-          <div className="mb-8 flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">Beta</span>
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="text-center md:text-left mb-8 md:mb-0 md:max-w-xl">
+              <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
+                <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">Beta</span>
                 <span className="text-sm text-gray-500">Free for .edu emails</span>
               </div>
-              <span className="hidden sm:inline text-gray-300">|</span>
-              <div className="hidden sm:flex items-center space-x-8 text-sm text-gray-500">
-                <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  10k+ games tracked
-                </span>
-                <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  50+ universities
-                </span>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Track Your Poker Progress
+              </h1>
+              <p className="text-lg text-gray-600 mb-6">
+                Simple analytics to help college students improve their poker game. Join 500+ students from 50+ universities.
+              </p>
+              <div className="flex items-center justify-center md:justify-start space-x-4">
+                <button className="bg-gray-900 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                  Join Beta Program
+                </button>
+                <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                  Learn more →
+                </button>
               </div>
             </div>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              Learn more →
-            </button>
+            <div className="flex items-center space-x-8">
+              <div className="hidden md:block px-8 py-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col space-y-3 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>10k+ games tracked</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>85% win rate increase</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>50+ universities</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </header>
 
-          {/* Demo Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-medium text-gray-900">
-              Try the Poker Session Tracker
-            </h1>
+      <main className="py-8">
+        {/* Demo Section */}
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-medium text-gray-900">
+              Try it yourself
+            </h2>
             <p className="mt-2 text-gray-600 text-sm">
               Enter your session details below to see how it works
             </p>
           </div>
-
-          {/* Demo Component */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <PokerTracker />
           </div>
+        </div>
 
-          {/* Features Grid - Below Demo */}
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
+        {/* Features Grid */}
+        <div className="max-w-6xl mx-auto px-4 mt-12">
+          <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               <div className="text-blue-600 mb-3">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,25 +146,10 @@ function App() {
             </div>
           </div>
         </div>
-
-        {/* Beta CTA */}
-        <div className="border-t border-gray-200 bg-white mt-12">
-          <div className="max-w-6xl mx-auto px-4 py-12">
-            <div className="flex flex-col sm:flex-row items-center justify-between">
-              <div>
-                <h2 className="text-xl font-medium text-gray-900 mb-2">Ready to improve your game?</h2>
-                <p className="text-gray-600 text-sm">Get 3 months free access with your .edu email</p>
-              </div>
-              <button className="mt-4 sm:mt-0 bg-gray-900 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-800 transition-colors">
-                Join Beta Program
-              </button>
-            </div>
-          </div>
-        </div>
       </main>
 
-      {/* Simple Footer */}
-      <footer className="border-t border-gray-200 bg-white">
+      {/* Footer */}
+      <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="text-sm text-gray-500">
