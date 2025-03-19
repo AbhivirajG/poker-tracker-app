@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PokerTracker from './components/PokerTracker';
+import EmailCollector from './components/EmailCollector';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -84,12 +85,7 @@ function App() {
                 Simple analytics to help college students improve their poker game. Join 500+ students from 50+ universities.
               </p>
               <div className="flex items-center justify-center md:justify-start space-x-4">
-                <button className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
-                  Join Beta Program
-                </button>
-                <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
-                  Learn more →
-                </button>
+                <EmailCollector className="w-full md:max-w-md" />
               </div>
             </div>
             <div className="flex items-center space-x-8">
