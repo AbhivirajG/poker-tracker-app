@@ -5,140 +5,159 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Minimal Header */}
-      <header className="fixed w-full top-0 bg-white border-b border-gray-100 z-50">
-        <nav className="max-w-5xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Simple Header */}
+      <header className="bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <span className="text-xl font-medium text-gray-900">pokes.io</span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#demo" className="text-gray-600 hover:text-gray-900 text-sm">
-                Try Demo
-              </a>
-              <a href="#about" className="text-gray-600 hover:text-gray-900 text-sm">
-                About
-              </a>
+            <span className="text-xl font-medium text-gray-900">pokes.io</span>
+            <div className="hidden md:flex items-center space-x-6">
+              <button className="text-gray-600 hover:text-gray-900 text-sm">
+                Log in
+              </button>
               <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
                 Join Beta
               </button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-500 hover:text-gray-900"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  {isMobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden text-gray-500 hover:text-gray-900"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
-
           {/* Mobile Menu */}
-          <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#demo" className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                Try Demo
-              </a>
-              <a href="#about" className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                About
-              </a>
-              <button className="w-full mt-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+          <div className={`md:hidden pb-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+            <div className="space-y-2">
+              <button className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                Log in
+              </button>
+              <button className="block w-full bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
                 Join Beta
               </button>
             </div>
           </div>
-        </nav>
+        </div>
       </header>
 
-      {/* Main Content */}
-      <main className="pt-16">
-        {/* Hero Section */}
-        <div className="py-16 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl font-medium text-gray-900 mb-4">
-              Track your poker sessions with ease
-            </h1>
-            <p className="text-gray-600 mb-8">
-              Simple, intuitive analytics for college poker players. Try the demo below.
-            </p>
-            <div className="inline-flex items-center space-x-2 text-sm text-blue-600 animate-bounce">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-              <span>Scroll to try</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Demo Section */}
-        <div id="demo" className="py-16 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-              <PokerTracker />
-            </div>
-          </div>
-        </div>
-
-        {/* About Section */}
-        <div id="about" className="py-16 px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl font-medium text-gray-900 mb-4">Why pokes.io?</h2>
-              <p className="text-gray-600">
-                Built by college students, for college students. Track your games, analyze your plays, and improve your win rate.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="text-2xl font-medium text-gray-900 mb-1">10k+</div>
-                <div className="text-sm text-gray-500">Games Tracked</div>
+      <main>
+        {/* Demo Section - The Heart of the App */}
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Context Banner */}
+          <div className="mb-8 flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">Beta</span>
+                <span className="text-sm text-gray-500">Free for .edu emails</span>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-medium text-gray-900 mb-1">85%</div>
-                <div className="text-sm text-gray-500">Win Rate Increase</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-medium text-gray-900 mb-1">50+</div>
-                <div className="text-sm text-gray-500">Universities</div>
+              <span className="hidden sm:inline text-gray-300">|</span>
+              <div className="hidden sm:flex items-center space-x-8 text-sm text-gray-500">
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  10k+ games tracked
+                </span>
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  50+ universities
+                </span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Beta Access */}
-        <div className="py-16 px-4 bg-gray-50">
-          <div className="max-w-xl mx-auto text-center">
-            <div className="inline-flex items-center space-x-2 mb-4">
-              <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">Beta</span>
-            </div>
-            <h2 className="text-2xl font-medium text-gray-900 mb-4">Early Access Available</h2>
-            <p className="text-gray-600 mb-8">
-              Join the beta program and get 3 months free access with your .edu email
-            </p>
-            <button className="bg-gray-900 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-800 transition-colors">
-              Join Beta Program
+            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              Learn more →
             </button>
+          </div>
+
+          {/* Demo Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-medium text-gray-900">
+              Try the Poker Session Tracker
+            </h1>
+            <p className="mt-2 text-gray-600 text-sm">
+              Enter your session details below to see how it works
+            </p>
+          </div>
+
+          {/* Demo Component */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <PokerTracker />
+          </div>
+
+          {/* Features Grid - Below Demo */}
+          <div className="grid md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="text-blue-600 mb-3">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Track Progress</h3>
+              <p className="text-sm text-gray-600">Monitor your improvement over time with detailed statistics</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="text-green-600 mb-3">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Export Data</h3>
+              <p className="text-sm text-gray-600">Download your session history and analysis in various formats</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="text-purple-600 mb-3">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Smart Insights</h3>
+              <p className="text-sm text-gray-600">Get personalized recommendations to improve your strategy</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Beta CTA */}
+        <div className="border-t border-gray-200 bg-white mt-12">
+          <div className="max-w-6xl mx-auto px-4 py-12">
+            <div className="flex flex-col sm:flex-row items-center justify-between">
+              <div>
+                <h2 className="text-xl font-medium text-gray-900 mb-2">Ready to improve your game?</h2>
+                <p className="text-gray-600 text-sm">Get 3 months free access with your .edu email</p>
+              </div>
+              <button className="mt-4 sm:mt-0 bg-gray-900 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+                Join Beta Program
+              </button>
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="border-t border-gray-100 py-8">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <div className="text-sm text-gray-500">
-            © 2024 pokes.io · <a href="mailto:support@pokes.io" className="hover:text-gray-900">support@pokes.io</a>
+      {/* Simple Footer */}
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div className="text-sm text-gray-500">
+              © 2024 pokes.io
+            </div>
+            <div className="mt-4 sm:mt-0 flex items-center space-x-6">
+              <a href="mailto:support@pokes.io" className="text-sm text-gray-500 hover:text-gray-900">
+                support@pokes.io
+              </a>
+              <a href="#privacy" className="text-sm text-gray-500 hover:text-gray-900">
+                Privacy
+              </a>
+              <a href="#terms" className="text-sm text-gray-500 hover:text-gray-900">
+                Terms
+              </a>
+            </div>
           </div>
         </div>
       </footer>
