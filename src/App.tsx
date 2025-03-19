@@ -1,44 +1,133 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PokerTracker from './components/PokerTracker';
 
 function App() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Navigation */}
       <nav className="bg-white/80 backdrop-blur-sm fixed w-full z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
+            {/* Logo and Brand */}
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">pokes.io</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-xl font-bold text-white">P</span>
+                </div>
+                <div>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">pokes.io</span>
+                  <div className="text-xs text-gray-500 -mt-1">College Poker Analytics</div>
+                </div>
+              </div>
             </div>
+
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
-              <a href="#demo" className="text-gray-600 hover:text-blue-600">Demo</a>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Join Beta
+              <div className="flex items-center space-x-6">
+                <a href="#features" className="text-gray-600 hover:text-blue-600 flex items-center space-x-1">
+                  <span className="text-blue-600">⚡</span>
+                  <span>Features</span>
+                </a>
+                <a href="#pricing" className="text-gray-600 hover:text-blue-600 flex items-center space-x-1">
+                  <span className="text-blue-600">💰</span>
+                  <span>Pricing</span>
+                </a>
+                <a href="#demo" className="text-gray-600 hover:text-blue-600 flex items-center space-x-1">
+                  <span className="text-blue-600">🎮</span>
+                  <span>Demo</span>
+                </a>
+              </div>
+              <div className="flex items-center space-x-4">
+                <button className="text-blue-600 hover:text-blue-700 font-medium">
+                  Log in
+                </button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                  <span>Join Beta</span>
+                  <span className="text-sm">🎲</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-gray-600 hover:text-blue-600 focus:outline-none"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white/80 backdrop-blur-sm border-t">
+            <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+              ⚡ Features
+            </a>
+            <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+              💰 Pricing
+            </a>
+            <a href="#demo" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+              🎮 Demo
+            </a>
+            <div className="px-3 py-2 space-y-2">
+              <button className="w-full text-left text-blue-600 hover:text-blue-700 font-medium py-2">
+                Log in
+              </button>
+              <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Join Beta 🎲
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="pt-24 pb-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Level Up Your <span className="text-blue-600">College Poker Game</span>
+      {/* Hero Section with Enhanced Header */}
+      <div className="pt-32 pb-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 z-0"></div>
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#3b82f6_0%,_transparent_60%)] opacity-10"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_#6366f1_0%,_transparent_60%)] opacity-10"></div>
+        </div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-block mb-4 px-4 py-1 bg-blue-50 rounded-full">
+            <span className="text-blue-600 text-sm font-medium">🎉 Now in Beta • Get 3 Months Free</span>
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+            Level Up Your{' '}
+            <span className="relative">
+              <span className="relative z-10 text-blue-600">College Poker Game</span>
+              <svg className="absolute -bottom-2 left-0 w-full h-3 text-blue-200" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <path fill="currentColor" d="M0 5 Q 25 0, 50 5 Q 75 10, 100 5 L 100 10 L 0 10 Z"></path>
+              </svg>
+            </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Track your games, analyze your plays, and crush your dorm room competition with pro-level analytics.
           </p>
-          <div className="flex justify-center gap-4">
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors">
-              Get Started Free
+          <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
+            <button className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+              <span>Get Started Free</span>
+              <span className="text-xl">→</span>
             </button>
-            <button className="border border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50 transition-colors">
-              Watch Demo
+            <button className="w-full sm:w-auto border border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center space-x-2">
+              <span>Watch Demo</span>
+              <span className="text-xl">▶</span>
             </button>
+          </div>
+          <div className="mt-8 flex justify-center space-x-4 text-sm text-gray-500">
+            <span className="flex items-center">✓ No credit card required</span>
+            <span className="flex items-center">✓ 3 months free trial</span>
           </div>
         </div>
       </div>
