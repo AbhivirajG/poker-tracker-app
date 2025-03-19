@@ -2,12 +2,11 @@
   "name": "poker-tracker-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://abhivirajg.github.io/poker-tracker-app/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "start": "NODE_OPTIONS='--openssl-legacy-provider' react-scripts start",
-    "build": "NODE_OPTIONS='--openssl-legacy-provider' react-scripts build",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
