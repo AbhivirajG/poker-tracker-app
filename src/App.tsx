@@ -116,7 +116,7 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <div className={`${showBanner ? 'pt-32' : 'pt-24'} pb-16 px-4 relative overflow-hidden transition-all duration-300`}>
+      <div className="pt-24 pb-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#f3f4f6_0%,_transparent_50%)] opacity-80"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center space-x-2 mb-6">
