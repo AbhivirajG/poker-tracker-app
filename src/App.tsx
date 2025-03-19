@@ -7,38 +7,57 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between h-16 items-center">
-            <span className="text-xl font-medium text-gray-900">pokes.io</span>
-            <div className="hidden md:flex items-center space-x-6">
-              <button className="text-gray-600 hover:text-gray-900 text-sm">
+      <nav className="fixed w-full top-0 bg-white z-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center h-20 px-8 border-b border-gray-100">
+            {/* Logo */}
+            <a href="/" className="flex items-baseline space-x-1">
+              <span className="text-2xl tracking-tight font-light text-gray-900">pokes</span>
+              <span className="text-2xl tracking-tight font-light text-gray-400">.io</span>
+            </a>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 tracking-wide">Features</a>
+              <a href="#demo" className="text-sm text-gray-600 hover:text-gray-900 tracking-wide">Demo</a>
+              <div className="h-4 w-px bg-gray-200 mx-2"></div>
+              <button className="text-sm text-gray-600 hover:text-gray-900 tracking-wide">
                 Log in
               </button>
-              <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+              <button className="text-sm bg-gray-900 text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-colors tracking-wide">
                 Join Beta
               </button>
             </div>
+
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-gray-500 hover:text-gray-900"
+              className="md:hidden text-gray-500 hover:text-gray-900 focus:outline-none"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
           </div>
+
           {/* Mobile Menu */}
-          <div className={`md:hidden pb-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
-            <div className="space-y-2">
-              <button className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+          <div 
+            className={`md:hidden border-b border-gray-100 transition-all duration-200 ease-in-out ${
+              isMobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+            }`}
+          >
+            <div className="px-8 py-4 space-y-4">
+              <a href="#features" className="block text-sm text-gray-600 hover:text-gray-900 tracking-wide">Features</a>
+              <a href="#demo" className="block text-sm text-gray-600 hover:text-gray-900 tracking-wide">Demo</a>
+              <div className="h-px bg-gray-100 my-4"></div>
+              <button className="block w-full text-left text-sm text-gray-600 hover:text-gray-900 tracking-wide mb-4">
                 Log in
               </button>
-              <button className="block w-full bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+              <button className="block w-full text-sm bg-gray-900 text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-colors tracking-wide">
                 Join Beta
               </button>
             </div>
@@ -46,9 +65,12 @@ function App() {
         </div>
       </nav>
 
+      {/* Content Spacer for Fixed Header */}
+      <div className="h-20"></div>
+
       {/* Header */}
       <header className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-6xl mx-auto px-8 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-8 md:mb-0 md:max-w-xl">
               <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
@@ -62,7 +84,7 @@ function App() {
                 Simple analytics to help college students improve their poker game. Join 500+ students from 50+ universities.
               </p>
               <div className="flex items-center justify-center md:justify-start space-x-4">
-                <button className="bg-gray-900 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                <button className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
                   Join Beta Program
                 </button>
                 <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
@@ -100,7 +122,7 @@ function App() {
 
       <main className="py-8">
         {/* Demo Section */}
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-medium text-gray-900">
               Try it yourself
@@ -115,7 +137,7 @@ function App() {
         </div>
 
         {/* Features Grid */}
-        <div className="max-w-6xl mx-auto px-4 mt-12">
+        <div className="max-w-6xl mx-auto px-8 mt-12">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               <div className="text-blue-600 mb-3">
@@ -150,7 +172,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white mt-12">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="text-sm text-gray-500">
               © 2024 pokes.io
