@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PokerTracker from './components/PokerTracker';
 import EmailCollector from './components/EmailCollector';
+import Admin from './pages/Admin';
 
-function App() {
+function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -163,6 +165,17 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/" element={<MainLayout />} />
+      </Routes>
+    </Router>
   );
 }
 
