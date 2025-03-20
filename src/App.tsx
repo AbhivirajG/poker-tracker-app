@@ -29,7 +29,7 @@ function App() {
                     <div className="h-4 w-px bg-gray-200"></div>
                     <EmailCollector 
                       buttonText="Join Beta" 
-                      placeholder="Enter .edu email" 
+                      placeholder="Enter your email" 
                       className="w-72"
                     />
                   </div>
@@ -58,7 +58,7 @@ function App() {
                   <div className="px-6 py-4 space-y-4 border-t border-gray-100">
                     <a href="#features" className="block text-sm text-gray-600 hover:text-gray-900 tracking-wide">Features</a>
                     <div className="h-px bg-gray-100"></div>
-                    <EmailCollector buttonText="Join Beta" placeholder="Enter .edu email" />
+                    <EmailCollector buttonText="Join Beta" placeholder="Enter your email" />
                   </div>
                 </div>
               </div>

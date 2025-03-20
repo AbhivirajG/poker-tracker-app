@@ -498,13 +498,13 @@ export default function PokerTracker() {
 
               <div className="space-y-3">
                 <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
-                  <p className="font-medium text-gray-900">🎓 Made for College Players</p>
-                  <p className="text-gray-600">Track your dorm games, analyze your plays, crush your friends.</p>
+                  <p className="font-medium text-gray-900">🎯 Professional Analytics</p>
+                  <p className="text-gray-600">Track your games, analyze your plays, improve your strategy.</p>
                 </div>
 
                 <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
-                  <p className="font-medium text-gray-900">💰 Student Budget</p>
-                  <p className="text-gray-600">Just one buy-in ($10/month) for pro-level analytics.</p>
+                  <p className="font-medium text-gray-900">💰 Affordable Price</p>
+                  <p className="text-gray-600">Professional features at just $10/month.</p>
                 </div>
 
                 <div className="bg-white/90 rounded-lg p-4 text-sm space-y-2 hover:transform hover:scale-105 transition-transform">
@@ -524,7 +524,7 @@ export default function PokerTracker() {
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <input
                       type="email"
-                      placeholder="your.college@edu"
+                      placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base"

@@ -42,10 +42,10 @@ export default function LandingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
         <div className="text-center space-y-6">
           <h1 className="text-5xl font-bold text-gray-900">
-            Level Up Your <span className="text-blue-600">College Poker Game</span>
+            Level Up Your <span className="text-blue-600">Poker Game</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Track your games, analyze your plays, and crush your dorm competitions with professional-grade poker analytics.
+            Track your games, analyze your plays, and improve your strategy with professional-grade poker analytics.
           </p>
         </div>
 
@@ -86,14 +86,14 @@ export default function LandingPage() {
                     </Button>
                     <div className="text-center space-y-2">
                       <p className="text-xs text-gray-500">
-                        🎓 Special student discount: $10/month
+                        🎲 Introductory price: $10/month
                       </p>
                       <p className="text-[11px] text-gray-400">
-                        Perfect for college players - just one buy-in for pro tools!
+                        Professional tools at an affordable price
                       </p>
                     </div>
                   </>
-                ) : (
+                ) :
                   <div className="text-center space-y-3 py-4">
                     <div className="flex justify-center">
                       <div className="bg-green-100 rounded-full p-2">
@@ -127,9 +127,9 @@ export default function LandingPage() {
               description="Understand your game with detailed stats and opportunity cost analysis."
             />
             <FeatureCard
-              icon="🎓"
-              title="College-Focused"
-              description="Built for dorm games and college tournaments. Start with just one buy-in."
+              icon="💎"
+              title="Pro Features"
+              description="Access professional-grade tools at an affordable price point."
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-4">pokes.io</h3>
-            <p className="text-gray-400">Elevate your college poker experience</p>
+            <p className="text-gray-400">Elevate your poker experience</p>
             <div className="mt-8 text-sm text-gray-500">
               © 2024 pokes.io. All rights reserved.
             </div>
