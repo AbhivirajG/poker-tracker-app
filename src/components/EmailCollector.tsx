@@ -9,7 +9,7 @@ interface EmailCollectorProps {
 
 export default function EmailCollector({ 
   buttonText = "Join Beta",
-  placeholder = "Enter your .edu email",
+  placeholder = "Enter your email",
   className = ""
 }: EmailCollectorProps) {
   const [email, setEmail] = useState('');
@@ -19,35 +19,55 @@ export default function EmailCollector({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email.endsWith('.edu')) {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       setStatus('error');
-      setErrorMessage('Please use a .edu email address');
+      setErrorMessage('Please enter a valid email address');
       return;
     }
 
     setStatus('loading');
     
     try {
-      const { error } = await supabase
+      // First check if email already exists
+      const { data: existingEmails, error: fetchError } = await supabase
         .from('emails')
-        .insert([{ email }]);
+        .select('email')
+        .eq('email', email)
+        .single();
 
-      if (error) {
-        if (error.code === '23505') {
-          setStatus('error');
-          setErrorMessage('This email has already been registered');
-        } else {
-          throw error;
-        }
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      if (existingEmails) {
+        setStatus('error');
+        setErrorMessage('This email has already been registered');
         return;
+      }
+
+      // Insert new email
+      const { error: insertError } = await supabase
+        .from('emails')
+        .insert([
+          { 
+            email,
+            timestamp: new Date().toISOString(),
+            source: 'beta_signup'
+          }
+        ]);
+
+      if (insertError) {
+        throw insertError;
       }
 
       setStatus('success');
       setEmail('');
     } catch (error) {
+      console.error('Error:', error);
       setStatus('error');
       setErrorMessage('Something went wrong. Please try again.');
-      console.error('Error:', error);
     }
   };
 
@@ -101,7 +121,7 @@ export default function EmailCollector({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <span>
-                <span className="font-medium">Success!</span> Check your inbox for next steps.
+                <span className="font-medium">Success!</span> You're on the waitlist!
               </span>
             </div>
           )}

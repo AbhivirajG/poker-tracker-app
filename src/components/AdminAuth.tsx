@@ -10,6 +10,7 @@ export default function AdminAuth({ onAuth }: AdminAuthProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,13 +18,31 @@ export default function AdminAuth({ onAuth }: AdminAuthProps) {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      if (isSigningUp) {
+        // Sign up new admin
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              role: 'admin'
+            }
+          }
+        });
+        
+        if (signUpError) throw signUpError;
+        setError('Please check your email for verification link.');
+        setIsSigningUp(false);
+      } else {
+        // Sign in existing admin
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (error) throw error;
-      onAuth();
+        if (signInError) throw signInError;
+        onAuth();
+      }
     } catch (err) {
       setError('Invalid credentials. Please try again.');
       console.error('Error:', err);
@@ -39,6 +58,9 @@ export default function AdminAuth({ onAuth }: AdminAuthProps) {
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
             Admin Access
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            {isSigningUp ? 'Create admin account' : 'Sign in to admin panel'}
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -82,13 +104,24 @@ export default function AdminAuth({ onAuth }: AdminAuthProps) {
             </div>
           )}
 
-          <div>
+          <div className="flex flex-col space-y-4">
             <button
               type="submit"
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Processing...' : isSigningUp ? 'Create Account' : 'Sign in'}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => {
+                setIsSigningUp(!isSigningUp);
+                setError(null);
+              }}
+              className="text-sm text-gray-600 hover:text-gray-900"
+            >
+              {isSigningUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
             </button>
           </div>
         </form>
