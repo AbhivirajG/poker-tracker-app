@@ -67,15 +67,25 @@ interface GroupMember extends LeaderboardMember {
   selected?: boolean;
 }
 
+interface SessionDetails {
+  gameType: string;
+  buyIn: number;
+  location?: string;
+  notes?: string;
+}
+
 interface GameSession {
   id: string;
   date: string;
   gameType: string;
+  location?: string;
+  notes?: string;
   players: {
     memberId: number;
     name: string;
     buyIns: number;
     duration: number;
+    totalBuyIn: number;
   }[];
 }
 
@@ -101,6 +111,12 @@ export default function PokerTracker() {
   const [buyIns, setBuyIns] = useState<Record<number, string>>({});
   const [duration, setDuration] = useState<Record<number, string>>({});
   const [selectedGameType, setSelectedGameType] = useState("");
+  const [sessionDetails, setSessionDetails] = useState<SessionDetails>({
+    gameType: "",
+    buyIn: 0,
+    location: "",
+    notes: ""
+  });
 
   // Update email list fetching
   useEffect(() => {
@@ -259,10 +275,13 @@ export default function PokerTracker() {
   ];
 
   const gameTypes = [
-    "Texas Hold'em",
-    "Omaha",
+    "Texas Hold'em - Cash Game",
+    "Texas Hold'em - Tournament",
+    "Omaha Hi",
+    "Omaha Hi-Lo",
     "Seven Card Stud",
-    "Short Deck",
+    "Short Deck Hold'em",
+    "Mixed Games"
   ];
 
   const handleCreateSession = (e: React.FormEvent) => {
@@ -270,7 +289,9 @@ export default function PokerTracker() {
     const newSession: GameSession = {
       id: Math.random().toString(36).substr(2, 9),
       date: new Date().toISOString(),
-      gameType: selectedGameType,
+      gameType: sessionDetails.gameType,
+      location: sessionDetails.location,
+      notes: sessionDetails.notes,
       players: selectedMembers
         .filter(member => member.selected)
         .map(member => ({
@@ -278,15 +299,21 @@ export default function PokerTracker() {
           name: member.name,
           buyIns: Number(buyIns[member.id] || 1),
           duration: Number(duration[member.id] || 0),
+          totalBuyIn: Number(buyIns[member.id] || 1) * sessionDetails.buyIn
         }))
     };
     setSessions([newSession, ...sessions]);
     
     // Reset form
-    setSelectedMembers(prev => prev.map(m => ({ ...m, selected: false })));
+    setSelectedMembers(mockLeaderboard.map(m => ({ ...m, selected: false })));
     setBuyIns({});
     setDuration({});
-    setSelectedGameType("");
+    setSessionDetails({
+      gameType: "",
+      buyIn: 0,
+      location: "",
+      notes: ""
+    });
   };
 
   return (
@@ -610,49 +637,105 @@ export default function PokerTracker() {
                               <DialogTitle>Create New Session</DialogTitle>
                             </DialogHeader>
                             <form onSubmit={handleCreateSession} className="space-y-6">
-                              {/* Game Type Selection */}
-                              <div className="space-y-2">
-                                <label className="text-sm font-medium">Game Type</label>
-                                <Select
-                                  value={selectedGameType}
-                                  onValueChange={setSelectedGameType}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select game type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {gameTypes.map((game) => (
-                                      <SelectItem key={game} value={game}>
-                                        {game}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                              {/* Game Details Section */}
+                              <div className="space-y-4">
+                                <h3 className="font-medium text-lg">Game Details</h3>
+                                
+                                {/* Game Type Selection */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Game Type</label>
+                                  <Select
+                                    value={sessionDetails.gameType}
+                                    onValueChange={(value) => 
+                                      setSessionDetails(prev => ({ ...prev, gameType: value }))
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select game type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {gameTypes.map((game) => (
+                                        <SelectItem key={game} value={game}>
+                                          {game}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                {/* Location */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Location (optional)</label>
+                                  <Input
+                                    placeholder="e.g., NYU Poker Room"
+                                    value={sessionDetails.location}
+                                    onChange={(e) => 
+                                      setSessionDetails(prev => ({ ...prev, location: e.target.value }))
+                                    }
+                                  />
+                                </div>
+
+                                {/* Default Buy-in */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Default Buy-in Amount ($)</label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="5"
+                                    placeholder="e.g., 100"
+                                    value={sessionDetails.buyIn || ""}
+                                    onChange={(e) => 
+                                      setSessionDetails(prev => ({ ...prev, buyIn: Number(e.target.value) }))
+                                    }
+                                  />
+                                </div>
+
+                                {/* Notes */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Session Notes (optional)</label>
+                                  <textarea
+                                    className="w-full rounded-md border p-2 text-sm min-h-[60px]"
+                                    placeholder="Any additional details about the session..."
+                                    value={sessionDetails.notes}
+                                    onChange={(e) => 
+                                      setSessionDetails(prev => ({ ...prev, notes: e.target.value }))
+                                    }
+                                  />
+                                </div>
                               </div>
 
-                              {/* Member Selection */}
+                              <div className="border-t my-4"></div>
+
+                              {/* Player Selection */}
                               <div className="space-y-4">
-                                <label className="text-sm font-medium">Select Players</label>
+                                <h3 className="font-medium text-lg">Select Players</h3>
                                 {mockLeaderboard.map((member) => (
-                                  <div key={member.id} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                                  <div key={member.id} className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                                     <Checkbox
                                       checked={selectedMembers.find(m => m.id === member.id)?.selected}
                                       onCheckedChange={(checked: boolean) => {
                                         setSelectedMembers(prev => 
                                           prev.map(m => 
                                             m.id === member.id 
-                                              ? { ...m, selected: checked }
+                                              ? { 
+                                                  ...m, 
+                                                  selected: checked,
+                                                  buyIns: checked ? 1 : 0,
+                                                  duration: checked ? 0 : 0
+                                                }
                                               : m
                                           )
                                         );
                                       }}
                                     />
-                                    <span>{member.name}</span>
+                                    <div className="flex-1">
+                                      <p className="font-medium">{member.name}</p>
+                                    </div>
                                     
                                     {selectedMembers.find(m => m.id === member.id)?.selected && (
-                                      <div className="flex gap-4 ml-auto">
-                                        <div className="flex items-center gap-2">
-                                          <label className="text-sm">Buy-ins:</label>
+                                      <div className="flex gap-4">
+                                        <div className="space-y-1">
+                                          <label className="text-xs text-gray-500">Buy-ins</label>
                                           <Input
                                             type="number"
                                             min="1"
@@ -661,11 +744,11 @@ export default function PokerTracker() {
                                               ...prev,
                                               [member.id]: e.target.value
                                             }))}
-                                            className="w-20"
+                                            className="w-24"
                                           />
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <label className="text-sm">Duration (hrs):</label>
+                                        <div className="space-y-1">
+                                          <label className="text-xs text-gray-500">Hours</label>
                                           <Input
                                             type="number"
                                             min="0"
@@ -675,8 +758,14 @@ export default function PokerTracker() {
                                               ...prev,
                                               [member.id]: e.target.value
                                             }))}
-                                            className="w-20"
+                                            className="w-24"
                                           />
+                                        </div>
+                                        <div className="space-y-1">
+                                          <label className="text-xs text-gray-500">Total Buy-in ($)</label>
+                                          <p className="text-sm font-medium pt-2">
+                                            ${(Number(buyIns[member.id] || 0) * sessionDetails.buyIn).toFixed(2)}
+                                          </p>
                                         </div>
                                       </div>
                                     )}
@@ -684,7 +773,11 @@ export default function PokerTracker() {
                                 ))}
                               </div>
 
-                              <Button type="submit" className="w-full">
+                              <Button 
+                                type="submit" 
+                                className="w-full"
+                                disabled={!sessionDetails.gameType || !sessionDetails.buyIn}
+                              >
                                 Start Session
                               </Button>
                             </form>
