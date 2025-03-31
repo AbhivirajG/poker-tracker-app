@@ -138,16 +138,45 @@ const CARDS: Card[] = RANKS.flatMap(rank =>
 
 const POSITIONS: Position[] = ["UTG", "MP", "CO", "BTN", "SB", "BB"];
 
-// First, define the Action type
-type Action = "Raise/Call 3-bet" | "Jam" | "Raise/Jam" | "Raise/Fold" | "Limp";
+// Update the Action type to include all possible actions
+type Action = 
+  | "Raise/Call 3-bet"
+  | "Raise/Fold"
+  | "Raise/Jam"
+  | "Jam"
+  | "Limp"
+  | "Fold"
+  | "Call"
+  | "";
 
 // Add type for the GTO chart
 type GTOChart = {
   [key: string]: Action;
 };
 
-// Add the getActionColor function
-const getActionColor = (action: Action | "") => {
+// Update the state definition
+const [gtoMove, setGtoMove] = useState<Action>("");
+
+// Update the handler
+const handleCheckGTO = () => {
+  if (!selectedCard1 || !selectedCard2) {
+    alert("Please select both cards");
+    return;
+  }
+  
+  const normalizedHand = normalizeToGTO(selectedCard1, selectedCard2);
+  console.log("Normalized Hand:", normalizedHand);
+  console.log("Selected Position:", selectedPosition);
+  
+  const positionChart = GTO_CHARTS[selectedPosition];
+  const action = positionChart[normalizedHand as keyof typeof positionChart] || positionChart["*"];
+  console.log("Found Action:", action);
+  
+  setGtoMove(action as Action);
+};
+
+// Update the getActionColor function to handle all actions
+const getActionColor = (action: Action) => {
   switch (action) {
     case "Raise/Call 3-bet":
       return "bg-green-100 text-green-800";
@@ -159,6 +188,10 @@ const getActionColor = (action: Action | "") => {
       return "bg-blue-100 text-blue-800";
     case "Limp":
       return "bg-yellow-100 text-yellow-800";
+    case "Call":
+      return "bg-cyan-100 text-cyan-800";
+    case "Fold":
+      return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
@@ -276,6 +309,129 @@ const GTO_SB: GTOChart = {
   "22": "Limp"
 } as const;
 
+// Define position-specific GTO charts
+const GTO_CHARTS = {
+  UTG: {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AKo": "Raise/Call 3-bet",
+    // Medium strength
+    "99": "Raise/Fold",
+    "88": "Raise/Fold",
+    "AJs": "Raise/Fold",
+    "ATs": "Raise/Fold",
+    "KQs": "Raise/Fold",
+    // Everything else
+    "*": "Fold"
+  },
+  MP: {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "99": "Raise/Call 3-bet",
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AJs": "Raise/Call 3-bet",
+    "AKo": "Raise/Call 3-bet",
+    // Medium strength
+    "88": "Raise/Fold",
+    "77": "Raise/Fold",
+    "ATs": "Raise/Fold",
+    "KQs": "Raise/Fold",
+    "KJs": "Raise/Fold",
+    // Everything else
+    "*": "Fold"
+  },
+  CO: {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "99": "Raise/Call 3-bet",
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AJs": "Raise/Call 3-bet",
+    "AKo": "Raise/Call 3-bet",
+    "AQo": "Raise/Call 3-bet",
+    // Medium strength
+    "88": "Raise/Fold",
+    "77": "Raise/Fold",
+    "66": "Raise/Fold",
+    "ATs": "Raise/Fold",
+    "KQs": "Raise/Fold",
+    "KJs": "Raise/Fold",
+    "QJs": "Raise/Fold",
+    // Everything else
+    "*": "Fold"
+  },
+  BTN: {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "99": "Raise/Call 3-bet",
+    "88": "Raise/Call 3-bet",
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AJs": "Raise/Call 3-bet",
+    "ATs": "Raise/Call 3-bet",
+    "KQs": "Raise/Call 3-bet",
+    "AKo": "Raise/Call 3-bet",
+    "AQo": "Raise/Call 3-bet",
+    // Medium strength
+    "77": "Raise/Fold",
+    "66": "Raise/Fold",
+    "55": "Raise/Fold",
+    "A9s": "Raise/Fold",
+    "A8s": "Raise/Fold",
+    "KJs": "Raise/Fold",
+    "QJs": "Raise/Fold",
+    "JTs": "Raise/Fold",
+    // Everything else
+    "*": "Fold"
+  },
+  SB: GTO_SB, // Use existing SB chart
+  BB: {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "99": "Raise/Call 3-bet",
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AJs": "Raise/Call 3-bet",
+    "AKo": "Raise/Call 3-bet",
+    // Defense hands
+    "88": "Call",
+    "77": "Call",
+    "66": "Call",
+    "55": "Call",
+    "44": "Call",
+    "33": "Call",
+    "22": "Call",
+    "ATs": "Call",
+    "KQs": "Call",
+    "KJs": "Call",
+    // Everything else
+    "*": "Fold"
+  }
+} as const;
+
 export default function PokerTracker() {
   const [view, setView] = useState<ViewType>("Week");
   const [activeSegment, setActiveSegment] = useState<SegmentType>("Overview");
@@ -314,7 +470,6 @@ export default function PokerTracker() {
   const [selectedCard1, setSelectedCard1] = useState<Card | null>(null);
   const [selectedCard2, setSelectedCard2] = useState<Card | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<Position>("UTG");
-  const [gtoMove, setGtoMove] = useState<Action | "">("");
   const [showDetails, setShowDetails] = useState(false);
 
   // Update email list fetching
@@ -516,23 +671,7 @@ export default function PokerTracker() {
     setSelectedGameType("");
   };
 
-  // Update the button implementation in the Learn tab section
-  const handleCheckGTO = () => {
-    if (!selectedCard1 || !selectedCard2) {
-      alert("Please select both cards");
-      return;
-    }
-    const normalizedHand = normalizeToGTO(selectedCard1, selectedCard2);
-    console.log("Normalized Hand:", normalizedHand); // Debug log
-    console.log("Selected Position:", selectedPosition); // Debug log
-    
-    // Use GTO_SB chart for all positions
-    const action = GTO_SB[normalizedHand];
-    console.log("Found Action:", action); // Debug log
-    setGtoMove(action || "");
-  };
-
-  // Update the normalizeToGTO function to be more robust
+  // Enhanced normalizeToGTO function
   const normalizeToGTO = (card1: Card | null, card2: Card | null): string => {
     if (!card1 || !card2) return "";
 
@@ -1348,7 +1487,7 @@ export default function PokerTracker() {
                             <SelectValue placeholder="Select position" />
                           </SelectTrigger>
                           <SelectContent>
-                            {POSITIONS.map((pos) => (
+                            {Object.keys(GTO_CHARTS).map((pos) => (
                               <SelectItem key={pos} value={pos}>
                                 {pos}
                               </SelectItem>
@@ -1376,9 +1515,19 @@ export default function PokerTracker() {
                             Hand: {selectedCard1?.display}{selectedCard2?.display} ({normalizeToGTO(selectedCard1, selectedCard2)})
                           </p>
                           <p className="text-lg">Recommended Action: {gtoMove}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            *Using Small Blind GTO ranges as reference
-                          </p>
+                          
+                          {/* Position-specific advice */}
+                          <div className="mt-4 text-sm bg-gray-50 p-3 rounded">
+                            <p className="font-medium">{selectedPosition} Strategy</p>
+                            <p className="mt-2 text-left">
+                              {selectedPosition === "UTG" && "Playing tight from UTG is crucial. Only continue with premium hands."}
+                              {selectedPosition === "MP" && "From MP, you can add some medium-strength hands to your range."}
+                              {selectedPosition === "CO" && "CO allows you to play more hands as you have position on most players."}
+                              {selectedPosition === "BTN" && "Button is the best position. You can play a wider range of hands."}
+                              {selectedPosition === "SB" && "SB requires careful play. Consider limping with speculative hands."}
+                              {selectedPosition === "BB" && "In BB, defend your big blind with appropriate hands and consider pot odds."}
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
