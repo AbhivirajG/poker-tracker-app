@@ -138,11 +138,16 @@ const CARDS: Card[] = RANKS.flatMap(rank =>
 
 const POSITIONS: Position[] = ["UTG", "MP", "CO", "BTN", "SB", "BB"];
 
-// Update the type to match the new actions
+// First, define the Action type
 type Action = "Raise/Call 3-bet" | "Jam" | "Raise/Jam" | "Raise/Fold" | "Limp";
 
-// Add color mapping for actions
-const getActionColor = (action: Action) => {
+// Add type for the GTO chart
+type GTOChart = {
+  [key: string]: Action;
+};
+
+// Add the getActionColor function
+const getActionColor = (action: Action | "") => {
   switch (action) {
     case "Raise/Call 3-bet":
       return "bg-green-100 text-green-800";
@@ -159,21 +164,18 @@ const getActionColor = (action: Action) => {
   }
 };
 
-// Update the GTO chart
-const GTO_CHART = {
-  SB: GTO_SB,
-  // Add simplified charts for other positions
-  BTN: {
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    // ... add more hands
-  },
-  // ... other positions
-} as const;
-
-// Add the GTO_SB constant
-const GTO_SB = {
+// Define the GTO_SB chart
+const GTO_SB: GTOChart = {
+  // Premium hands
   "AA": "Raise/Call 3-bet",
+  "KK": "Raise/Call 3-bet",
+  "QQ": "Raise/Call 3-bet",
+  "JJ": "Raise/Call 3-bet",
+  "TT": "Raise/Call 3-bet",
+  "99": "Raise/Call 3-bet",
+  "88": "Raise/Call 3-bet",
+  
+  // Strong Aces suited
   "AKs": "Raise/Call 3-bet",
   "AQs": "Raise/Call 3-bet",
   "AJs": "Raise/Call 3-bet",
@@ -187,52 +189,102 @@ const GTO_SB = {
   "A3s": "Raise/Call 3-bet",
   "A2s": "Raise/Call 3-bet",
 
+  // Strong Aces offsuit
   "AKo": "Raise/Call 3-bet",
   "AQo": "Raise/Call 3-bet",
   "AJo": "Raise/Call 3-bet",
   "ATo": "Raise/Call 3-bet",
+  
+  // Strong Broadway
   "KQo": "Raise/Call 3-bet",
   "KJo": "Raise/Call 3-bet",
   "QJo": "Raise/Call 3-bet",
 
-  "KK": "Raise/Call 3-bet",
-  "QQ": "Raise/Call 3-bet",
-  "JJ": "Raise/Call 3-bet",
-  "TT": "Raise/Call 3-bet",
-  "99": "Raise/Call 3-bet",
-  "88": "Raise/Call 3-bet",
-
+  // Jam hands
   "A9o": "Jam",
   "33": "Jam",
 
-  // Raise/Jam
-  "K9o": "Raise/Jam", "Q9o": "Raise/Jam", "J9o": "Raise/Jam", "T9o": "Raise/Jam", "J8o": "Raise/Jam", "T8o": "Raise/Jam",
-  "98o": "Raise/Jam", "97o": "Raise/Jam", "87o": "Raise/Jam", "76o": "Raise/Jam", "65o": "Raise/Jam",
-  "K9s": "Raise/Jam", "K8s": "Raise/Jam", "Q8s": "Raise/Jam", "J8s": "Raise/Jam", "T8s": "Raise/Jam",
-  "96s": "Raise/Jam", "86s": "Raise/Jam", "75s": "Raise/Jam", "65s": "Raise/Jam", "54s": "Raise/Jam",
-  "43s": "Raise/Jam", "32s": "Raise/Jam",
+  // Raise/Jam hands
+  "K9o": "Raise/Jam",
+  "Q9o": "Raise/Jam",
+  "J9o": "Raise/Jam",
+  "T9o": "Raise/Jam",
+  "98o": "Raise/Jam",
+  "97o": "Raise/Jam",
+  "87o": "Raise/Jam",
+  "76o": "Raise/Jam",
+  "65o": "Raise/Jam",
+  "K9s": "Raise/Jam",
+  "K8s": "Raise/Jam",
+  "Q8s": "Raise/Jam",
+  "J8s": "Raise/Jam",
+  "T8s": "Raise/Jam",
+  "95s": "Raise/Jam",
+  "85s": "Raise/Jam",
+  "74s": "Raise/Jam",
+  "64s": "Raise/Jam",
+  "53s": "Raise/Jam",
+  "43s": "Raise/Jam",
 
-  // Raise/Fold
-  "A8o": "Raise/Fold", "K8o": "Raise/Fold", "Q8o": "Raise/Fold", "J8o": "Raise/Fold", "T8o": "Raise/Fold",
-  "A7o": "Raise/Fold", "K7o": "Raise/Fold", "Q7o": "Raise/Fold", "J7o": "Raise/Fold", "T7o": "Raise/Fold",
-  "A6o": "Raise/Fold", "K6o": "Raise/Fold", "Q6o": "Raise/Fold", "J6o": "Raise/Fold", "T6o": "Raise/Fold",
-  "A5o": "Raise/Fold", "K5o": "Raise/Fold", "Q5o": "Raise/Fold", "J5o": "Raise/Fold", "T5o": "Raise/Fold",
-  "A4o": "Raise/Fold", "K4o": "Raise/Fold", "Q4o": "Raise/Fold", "J4o": "Raise/Fold", "T4o": "Raise/Fold",
-  "A3o": "Raise/Fold", "K3o": "Raise/Fold", "Q3o": "Raise/Fold", "J3o": "Raise/Fold", "T3o": "Raise/Fold",
-  "A2o": "Raise/Fold", "K2o": "Raise/Fold", "Q2o": "Raise/Fold", "J2o": "Raise/Fold", "T2o": "Raise/Fold",
+  // Raise/Fold hands
+  "A8o": "Raise/Fold",
+  "A7o": "Raise/Fold",
+  "A6o": "Raise/Fold",
+  "A5o": "Raise/Fold",
+  "A4o": "Raise/Fold",
+  "A3o": "Raise/Fold",
+  "A2o": "Raise/Fold",
+  "K7o": "Raise/Fold",
+  "K6o": "Raise/Fold",
+  "K5o": "Raise/Fold",
+  "K4o": "Raise/Fold",
+  "K3o": "Raise/Fold",
+  "K2o": "Raise/Fold",
+  "Q8o": "Raise/Fold",
+  "Q7o": "Raise/Fold",
+  "Q6o": "Raise/Fold",
+  "Q5o": "Raise/Fold",
+  "Q4o": "Raise/Fold",
+  "Q3o": "Raise/Fold",
+  "Q2o": "Raise/Fold",
 
-  // Limp
-  "K7s": "Limp", "K6s": "Limp", "K5s": "Limp", "K4s": "Limp", "K3s": "Limp", "K2s": "Limp",
-  "Q7s": "Limp", "Q6s": "Limp", "Q5s": "Limp", "Q4s": "Limp", "Q3s": "Limp", "Q2s": "Limp",
-  "J7s": "Limp", "J6s": "Limp", "J5s": "Limp", "J4s": "Limp", "J3s": "Limp", "J2s": "Limp",
-  "T7s": "Limp", "T6s": "Limp", "T5s": "Limp", "T4s": "Limp", "T3s": "Limp", "T2s": "Limp",
-  "97s": "Limp", "96s": "Limp", "95s": "Limp", "94s": "Limp", "93s": "Limp", "92s": "Limp",
-  "87s": "Limp", "86s": "Limp", "85s": "Limp", "84s": "Limp", "83s": "Limp", "82s": "Limp",
-  "76s": "Limp", "75s": "Limp", "74s": "Limp", "73s": "Limp", "72s": "Limp",
-  "65s": "Limp", "64s": "Limp", "63s": "Limp", "62s": "Limp",
-  "54s": "Limp", "53s": "Limp", "52s": "Limp",
-  "43s": "Limp", "42s": "Limp",
-  "32s": "Limp", "22": "Limp",
+  // Limp hands
+  "K7s": "Limp",
+  "K6s": "Limp",
+  "K5s": "Limp",
+  "K4s": "Limp",
+  "K3s": "Limp",
+  "K2s": "Limp",
+  "Q7s": "Limp",
+  "Q6s": "Limp",
+  "Q5s": "Limp",
+  "Q4s": "Limp",
+  "Q3s": "Limp",
+  "Q2s": "Limp",
+  "J7s": "Limp",
+  "J6s": "Limp",
+  "J5s": "Limp",
+  "J4s": "Limp",
+  "J3s": "Limp",
+  "J2s": "Limp",
+  "T7s": "Limp",
+  "T6s": "Limp",
+  "T5s": "Limp",
+  "T4s": "Limp",
+  "T3s": "Limp",
+  "T2s": "Limp",
+  "22": "Limp"
+} as const;
+
+// Then define the GTO_CHART with proper typing
+const GTO_CHART: { [key: string]: GTOChart } = {
+  SB: GTO_SB,
+  BTN: {
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    // Add more hands for BTN...
+  },
+  // Add other positions...
 } as const;
 
 export default function PokerTracker() {
@@ -475,34 +527,44 @@ export default function PokerTracker() {
     setSelectedGameType("");
   };
 
-  // Add this utility function
-  const normalizeToGTO = (card1: Card | null, card2: Card | null): string => {
-    if (!card1 || !card2) return "";
-    
-    if (card1.rank === card2.rank) {
-      return card1.rank + card1.rank;
-    }
-    
-    // Make sure higher card is first
-    const [highCard, lowCard] = 
-      RANKS.indexOf(card1.rank) < RANKS.indexOf(card2.rank) 
-        ? [card1, card2] 
-        : [card2, card1];
-    
-    return highCard.rank + lowCard.rank + (highCard.suit === lowCard.suit ? "s" : "o");
-  };
-
-  // Update the handler
+  // Update the button implementation in the Learn tab section
   const handleCheckGTO = () => {
+    if (!selectedCard1 || !selectedCard2) {
+      alert("Please select both cards");
+      return;
+    }
     const normalizedHand = normalizeToGTO(selectedCard1, selectedCard2);
-    const position = selectedPosition as keyof typeof GTO_CHART;
-    const action = GTO_CHART[position]?.[normalizedHand as keyof typeof GTO_SB];
+    console.log("Normalized Hand:", normalizedHand); // Debug log
+    console.log("Selected Position:", selectedPosition); // Debug log
     
-    if (action) {
-      setGtoMove(action as Action);
+    const chart = GTO_CHART[selectedPosition];
+    if (chart && normalizedHand) {
+      const action = chart[normalizedHand];
+      console.log("Found Action:", action); // Debug log
+      setGtoMove(action || "");
     } else {
       setGtoMove("");
     }
+  };
+
+  // Update the normalizeToGTO function to be more robust
+  const normalizeToGTO = (card1: Card | null, card2: Card | null): string => {
+    if (!card1 || !card2) return "";
+
+    // Sort cards by rank (using the RANKS array for proper order)
+    const [highCard, lowCard] = 
+      RANKS.indexOf(card1.rank) <= RANKS.indexOf(card2.rank) 
+        ? [card1, card2] 
+        : [card2, card1];
+
+    // Handle pocket pairs
+    if (highCard.rank === lowCard.rank) {
+      return highCard.rank + lowCard.rank;
+    }
+
+    // Handle suited and offsuit hands
+    const suffix = highCard.suit === lowCard.suit ? "s" : "o";
+    return highCard.rank + lowCard.rank + suffix;
   };
 
   return (
@@ -1256,7 +1318,7 @@ export default function PokerTracker() {
                             }
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select card" />
+                              <SelectValue placeholder="Select first card" />
                             </SelectTrigger>
                             <SelectContent>
                               {CARDS.map((card) => (
@@ -1277,7 +1339,7 @@ export default function PokerTracker() {
                             }
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select card" />
+                              <SelectValue placeholder="Select second card" />
                             </SelectTrigger>
                             <SelectContent>
                               {CARDS.map((card) => (
@@ -1319,67 +1381,16 @@ export default function PokerTracker() {
                         Check GTO Move
                       </Button>
 
-                      {/* Display Result */}
+                      {/* Result Display */}
                       {gtoMove && (
-                        <div className="mt-4 space-y-4">
-                          <div className={cn(
-                            "p-4 rounded-lg text-center font-medium",
-                            getActionColor(gtoMove)
-                          )}>
-                            <p className="text-sm mb-1">Hand: {normalizeToGTO(selectedCard1, selectedCard2)}</p>
-                            <p className="text-lg">Recommended Action: {gtoMove}</p>
-                            
-                            {/* Action Description */}
-                            <div className="mt-4 text-sm">
-                              {gtoMove === "Raise/Call 3-bet" && (
-                                <p>Raise first in, call if someone 3-bets</p>
-                              )}
-                              {gtoMove === "Jam" && (
-                                <p>Move all-in if no one has raised</p>
-                              )}
-                              {gtoMove === "Raise/Jam" && (
-                                <p>Raise first in, jam over a raise</p>
-                              )}
-                              {gtoMove === "Raise/Fold" && (
-                                <p>Raise first in, fold to a 3-bet</p>
-                              )}
-                              {gtoMove === "Limp" && (
-                                <p>Call the small blind, fold to raises</p>
-                              )}
-                            </div>
-
-                            {/* Color Legend */}
-                            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                              <div className="bg-green-100 text-green-800 p-2 rounded">
-                                🟩 Raise/Call 3-bet
-                              </div>
-                              <div className="bg-purple-100 text-purple-800 p-2 rounded">
-                                🟪 Jam
-                              </div>
-                              <div className="bg-orange-100 text-orange-800 p-2 rounded">
-                                🟧 Raise/Jam
-                              </div>
-                              <div className="bg-blue-100 text-blue-800 p-2 rounded">
-                                🟦 Raise/Fold
-                              </div>
-                              <div className="bg-yellow-100 text-yellow-800 p-2 rounded">
-                                🟨 Limp
-                              </div>
-                            </div>
-
-                            {/* Position Context */}
-                            {selectedPosition === "SB" && (
-                              <div className="mt-4 text-sm bg-gray-50 p-3 rounded">
-                                <p className="font-medium">Small Blind Strategy</p>
-                                <ul className="mt-2 text-left space-y-1">
-                                  <li>• Premium hands: Raise and call 3-bets</li>
-                                  <li>• Medium strength: Raise and jam over raises</li>
-                                  <li>• Speculative hands: Raise and fold to 3-bets</li>
-                                  <li>• Weak hands: Limp and fold to raises</li>
-                                </ul>
-                              </div>
-                            )}
-                          </div>
+                        <div className={cn(
+                          "p-4 rounded-lg text-center font-medium",
+                          getActionColor(gtoMove)
+                        )}>
+                          <p className="text-sm mb-1">
+                            Hand: {selectedCard1?.display}{selectedCard2?.display} ({normalizeToGTO(selectedCard1, selectedCard2)})
+                          </p>
+                          <p className="text-lg">Recommended Action: {gtoMove}</p>
                         </div>
                       )}
                     </div>
