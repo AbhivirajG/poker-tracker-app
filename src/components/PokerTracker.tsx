@@ -1439,15 +1439,31 @@ export default function PokerTracker() {
                               setSelectedCard1(CARDS.find(c => c.display === value) || null)
                             }
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select first card" />
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Select card" />
                             </SelectTrigger>
-                            <SelectContent>
-                              {CARDS.map((card) => (
-                                <SelectItem key={card.display} value={card.display}>
-                                  {card.display}
-                                </SelectItem>
-                              ))}
+                            <SelectContent 
+                              position="popper" 
+                              side="bottom" 
+                              align="start"
+                              className="max-h-[200px] overflow-y-auto bg-white border-2"
+                            >
+                              <div className="grid grid-cols-4 gap-1 p-2">
+                                {CARDS.map((card) => (
+                                  <SelectItem 
+                                    key={card.display} 
+                                    value={card.display}
+                                    className="px-2 py-1 text-center rounded hover:bg-blue-100 focus:bg-blue-100 cursor-pointer data-[state=checked]:bg-blue-200 data-[state=checked]:text-blue-800"
+                                  >
+                                    <span className={cn(
+                                      "font-medium",
+                                      card.suit === 'h' || card.suit === 'd' ? 'text-red-600' : 'text-slate-800'
+                                    )}>
+                                      {card.display}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </div>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1460,15 +1476,31 @@ export default function PokerTracker() {
                               setSelectedCard2(CARDS.find(c => c.display === value) || null)
                             }
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select second card" />
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Select card" />
                             </SelectTrigger>
-                            <SelectContent>
-                              {CARDS.map((card) => (
-                                <SelectItem key={card.display} value={card.display}>
-                                  {card.display}
-                                </SelectItem>
-                              ))}
+                            <SelectContent 
+                              position="popper" 
+                              side="bottom" 
+                              align="start"
+                              className="max-h-[200px] overflow-y-auto bg-white border-2"
+                            >
+                              <div className="grid grid-cols-4 gap-1 p-2">
+                                {CARDS.map((card) => (
+                                  <SelectItem 
+                                    key={card.display} 
+                                    value={card.display}
+                                    className="px-2 py-1 text-center rounded hover:bg-blue-100 focus:bg-blue-100 cursor-pointer data-[state=checked]:bg-blue-200 data-[state=checked]:text-blue-800"
+                                  >
+                                    <span className={cn(
+                                      "font-medium",
+                                      card.suit === 'h' || card.suit === 'd' ? 'text-red-600' : 'text-slate-800'
+                                    )}>
+                                      {card.display}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </div>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1481,12 +1513,21 @@ export default function PokerTracker() {
                           value={selectedPosition}
                           onValueChange={(value: Position) => setSelectedPosition(value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white">
                             <SelectValue placeholder="Select position" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent 
+                            position="popper" 
+                            side="bottom" 
+                            align="start"
+                            className="bg-white border-2"
+                          >
                             {Object.keys(GTO_CHARTS).map((pos) => (
-                              <SelectItem key={pos} value={pos as Position}>
+                              <SelectItem 
+                                key={pos} 
+                                value={pos as Position}
+                                className="hover:bg-blue-100 focus:bg-blue-100 cursor-pointer data-[state=checked]:bg-blue-200 data-[state=checked]:text-blue-800"
+                              >
                                 {pos}
                               </SelectItem>
                             ))}
