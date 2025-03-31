@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Input } from "./ui/input";
 
 type ViewType = "Day" | "Week" | "Month";
-type SegmentType = "Overview" | "Session" | "Cost" | "Community";
+type SegmentType = "Overview" | "Session" | "Cost" | "Community" | "Learn";
 
 interface PokerStats {
   winnings: number;
@@ -258,7 +258,7 @@ export default function PokerTracker() {
     };
   };
 
-  const segments: SegmentType[] = ["Overview", "Session", "Cost", "Community"];
+  const segments: SegmentType[] = ["Overview", "Session", "Cost", "Community", "Learn"];
 
   // Calculate net profit
   const netProfit = data.winnings - data.losses;
@@ -1077,6 +1077,19 @@ export default function PokerTracker() {
                         </CardContent>
                       </Card>
                     )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {activeSegment === "Learn" && (
+              <div className="space-y-6">
+                <Card className="border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-2xl font-bold text-blue-600">Learning Center</h3>
+                    </div>
+                    {/* Content will be added here based on your requirements */}
                   </CardContent>
                 </Card>
               </div>
