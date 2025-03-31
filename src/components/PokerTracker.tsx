@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock, Calendar, Gamepad2 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from '../lib/supabase';
@@ -67,11 +67,18 @@ interface GroupMember extends LeaderboardMember {
   selected?: boolean;
 }
 
+interface TableSettings {
+  blinds: string;
+  minBuyIn: number;
+  maxBuyIn: number;
+  rake?: number;
+}
+
 interface SessionDetails {
   gameType: string;
-  buyIn: number;
-  location?: string;
-  notes?: string;
+  location: string;
+  tableSettings: TableSettings;
+  notes: string;
 }
 
 interface GameSession {
@@ -86,7 +93,27 @@ interface GameSession {
     buyIns: number;
     duration: number;
     totalBuyIn: number;
+    startTime?: string;
+    endTime?: string;
   }[];
+}
+
+interface PlayerSession {
+  memberId: number;
+  name: string;
+  buyIns: number;
+  startTime?: string;
+  endTime?: string;
+  isActive: boolean;
+  duration: number;
+}
+
+interface ActiveSession {
+  id: string;
+  gameType: string;
+  startTime: string;
+  players: PlayerSession[];
+  isActive: boolean;
 }
 
 export default function PokerTracker() {
@@ -113,10 +140,17 @@ export default function PokerTracker() {
   const [selectedGameType, setSelectedGameType] = useState("");
   const [sessionDetails, setSessionDetails] = useState<SessionDetails>({
     gameType: "",
-    buyIn: 0,
     location: "",
+    tableSettings: {
+      blinds: "",
+      minBuyIn: 0,
+      maxBuyIn: 0,
+      rake: 0
+    },
     notes: ""
   });
+  const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
+  const [playerSessions, setPlayerSessions] = useState<Record<number, PlayerSession>>({});
 
   // Update email list fetching
   useEffect(() => {
@@ -284,36 +318,37 @@ export default function PokerTracker() {
     "Mixed Games"
   ];
 
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+  };
+
   const handleCreateSession = (e: React.FormEvent) => {
     e.preventDefault();
+    
     const newSession: GameSession = {
       id: Math.random().toString(36).substr(2, 9),
       date: new Date().toISOString(),
-      gameType: sessionDetails.gameType,
-      location: sessionDetails.location,
-      notes: sessionDetails.notes,
-      players: selectedMembers
-        .filter(member => member.selected)
-        .map(member => ({
-          memberId: member.id,
-          name: member.name,
-          buyIns: Number(buyIns[member.id] || 1),
-          duration: Number(duration[member.id] || 0),
-          totalBuyIn: Number(buyIns[member.id] || 1) * sessionDetails.buyIn
-        }))
+      gameType: selectedGameType,
+      players: Object.values(playerSessions).map(player => ({
+        memberId: player.memberId,
+        name: player.name,
+        buyIns: player.buyIns,
+        duration: player.duration || 0,
+        totalBuyIn: player.buyIns * (sessionDetails?.tableSettings.minBuyIn || 100),
+        startTime: player.startTime,
+        endTime: player.endTime
+      }))
     };
+
     setSessions([newSession, ...sessions]);
     
     // Reset form
     setSelectedMembers(mockLeaderboard.map(m => ({ ...m, selected: false })));
-    setBuyIns({});
-    setDuration({});
-    setSessionDetails({
-      gameType: "",
-      buyIn: 0,
-      location: "",
-      notes: ""
-    });
+    setPlayerSessions({});
+    setSelectedGameType("");
   };
 
   return (
@@ -632,154 +667,274 @@ export default function PokerTracker() {
                               New Session
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Create New Session</DialogTitle>
+                          <DialogContent className="max-w-2xl bg-white border-0 rounded-lg shadow-xl">
+                            <DialogHeader className="border-b pb-3">
+                              <DialogTitle className="text-lg font-bold">New Poker Session</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleCreateSession} className="space-y-6">
-                              {/* Game Details Section */}
-                              <div className="space-y-4">
-                                <h3 className="font-medium text-lg">Game Details</h3>
+                            
+                            <form onSubmit={handleCreateSession} className="space-y-4">
+                              {/* Game Settings Section */}
+                              <div className="space-y-3">
+                                <h3 className="text-md font-semibold flex items-center gap-2">
+                                  <Gamepad2 className="h-4 w-4 text-blue-500" />
+                                  Game Settings
+                                </h3>
                                 
-                                {/* Game Type Selection */}
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Game Type</label>
-                                  <Select
-                                    value={sessionDetails.gameType}
-                                    onValueChange={(value) => 
-                                      setSessionDetails(prev => ({ ...prev, gameType: value }))
-                                    }
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select game type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {gameTypes.map((game) => (
-                                        <SelectItem key={game} value={game}>
-                                          {game}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                <div className="grid grid-cols-2 gap-3">
+                                  {/* Game Type */}
+                                  <div className="space-y-1">
+                                    <label className="text-sm font-medium">Game Type</label>
+                                    <Select
+                                      value={sessionDetails.gameType}
+                                      onValueChange={(value) => 
+                                        setSessionDetails(prev => ({ ...prev, gameType: value }))
+                                      }
+                                    >
+                                      <SelectTrigger className="bg-white h-8">
+                                        <SelectValue placeholder="Select game type" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {[
+                                          "Texas Hold'em - Cash Game",
+                                          "Texas Hold'em - Tournament",
+                                          "PLO - Cash Game",
+                                          "PLO - Tournament",
+                                          "Mixed Games",
+                                          "Short Deck",
+                                          "Other"
+                                        ].map((game) => (
+                                          <SelectItem key={game} value={game}>{game}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+
+                                  {/* Location */}
+                                  <div className="space-y-1">
+                                    <label className="text-sm font-medium">Location</label>
+                                    <Input
+                                      placeholder="e.g., NYU Poker Room"
+                                      value={sessionDetails.location}
+                                      onChange={(e) => 
+                                        setSessionDetails(prev => ({ ...prev, location: e.target.value }))
+                                      }
+                                      className="bg-white h-8"
+                                    />
+                                  </div>
                                 </div>
 
-                                {/* Location */}
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Location (optional)</label>
-                                  <Input
-                                    placeholder="e.g., NYU Poker Room"
-                                    value={sessionDetails.location}
-                                    onChange={(e) => 
-                                      setSessionDetails(prev => ({ ...prev, location: e.target.value }))
-                                    }
-                                  />
-                                </div>
-
-                                {/* Default Buy-in */}
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Default Buy-in Amount ($)</label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    step="5"
-                                    placeholder="e.g., 100"
-                                    value={sessionDetails.buyIn || ""}
-                                    onChange={(e) => 
-                                      setSessionDetails(prev => ({ ...prev, buyIn: Number(e.target.value) }))
-                                    }
-                                  />
-                                </div>
-
-                                {/* Notes */}
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Session Notes (optional)</label>
-                                  <textarea
-                                    className="w-full rounded-md border p-2 text-sm min-h-[60px]"
-                                    placeholder="Any additional details about the session..."
-                                    value={sessionDetails.notes}
-                                    onChange={(e) => 
-                                      setSessionDetails(prev => ({ ...prev, notes: e.target.value }))
-                                    }
-                                  />
+                                {/* Table Settings */}
+                                <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
+                                  <h4 className="text-sm font-medium">Table Settings</h4>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                      <label className="text-xs font-medium">Blinds</label>
+                                      <Input
+                                        placeholder="e.g., 1/2"
+                                        value={sessionDetails.tableSettings.blinds}
+                                        onChange={(e) => 
+                                          setSessionDetails(prev => ({
+                                            ...prev,
+                                            tableSettings: {
+                                              ...prev.tableSettings,
+                                              blinds: e.target.value
+                                            }
+                                          }))
+                                        }
+                                        className="bg-white h-8"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-xs font-medium">Rake %</label>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        placeholder="e.g., 5"
+                                        value={sessionDetails.tableSettings.rake || ""}
+                                        onChange={(e) => 
+                                          setSessionDetails(prev => ({
+                                            ...prev,
+                                            tableSettings: {
+                                              ...prev.tableSettings,
+                                              rake: Number(e.target.value)
+                                            }
+                                          }))
+                                        }
+                                        className="bg-white h-8"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-xs font-medium">Min Buy-in</label>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        placeholder="Minimum buy-in amount"
+                                        value={sessionDetails.tableSettings.minBuyIn || ""}
+                                        onChange={(e) => 
+                                          setSessionDetails(prev => ({
+                                            ...prev,
+                                            tableSettings: {
+                                              ...prev.tableSettings,
+                                              minBuyIn: Number(e.target.value)
+                                            }
+                                          }))
+                                        }
+                                        className="bg-white h-8"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-xs font-medium">Max Buy-in</label>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        placeholder="Maximum buy-in amount"
+                                        value={sessionDetails.tableSettings.maxBuyIn || ""}
+                                        onChange={(e) => 
+                                          setSessionDetails(prev => ({
+                                            ...prev,
+                                            tableSettings: {
+                                              ...prev.tableSettings,
+                                              maxBuyIn: Number(e.target.value)
+                                            }
+                                          }))
+                                        }
+                                        className="bg-white h-8"
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-
-                              <div className="border-t my-4"></div>
 
                               {/* Player Selection */}
-                              <div className="space-y-4">
-                                <h3 className="font-medium text-lg">Select Players</h3>
-                                {mockLeaderboard.map((member) => (
-                                  <div key={member.id} className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                                    <Checkbox
-                                      checked={selectedMembers.find(m => m.id === member.id)?.selected}
-                                      onCheckedChange={(checked: boolean) => {
-                                        setSelectedMembers(prev => 
-                                          prev.map(m => 
-                                            m.id === member.id 
-                                              ? { 
-                                                  ...m, 
-                                                  selected: checked,
-                                                  buyIns: checked ? 1 : 0,
-                                                  duration: checked ? 0 : 0
-                                                }
-                                              : m
-                                          )
-                                        );
-                                      }}
-                                    />
-                                    <div className="flex-1">
-                                      <p className="font-medium">{member.name}</p>
-                                    </div>
-                                    
-                                    {selectedMembers.find(m => m.id === member.id)?.selected && (
-                                      <div className="flex gap-4">
-                                        <div className="space-y-1">
-                                          <label className="text-xs text-gray-500">Buy-ins</label>
-                                          <Input
-                                            type="number"
-                                            min="1"
-                                            value={buyIns[member.id] || ""}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBuyIns(prev => ({
-                                              ...prev,
-                                              [member.id]: e.target.value
-                                            }))}
-                                            className="w-24"
-                                          />
-                                        </div>
-                                        <div className="space-y-1">
-                                          <label className="text-xs text-gray-500">Hours</label>
-                                          <Input
-                                            type="number"
-                                            min="0"
-                                            step="0.5"
-                                            value={duration[member.id] || ""}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDuration(prev => ({
-                                              ...prev,
-                                              [member.id]: e.target.value
-                                            }))}
-                                            className="w-24"
-                                          />
-                                        </div>
-                                        <div className="space-y-1">
-                                          <label className="text-xs text-gray-500">Total Buy-in ($)</label>
-                                          <p className="text-sm font-medium pt-2">
-                                            ${(Number(buyIns[member.id] || 0) * sessionDetails.buyIn).toFixed(2)}
-                                          </p>
-                                        </div>
+                              <div className="space-y-3">
+                                <h3 className="text-md font-semibold flex items-center gap-2">
+                                  <Users className="h-4 w-4 text-blue-500" />
+                                  Players
+                                </h3>
+                                
+                                <div className="max-h-[200px] overflow-y-auto space-y-2">
+                                  {mockLeaderboard.map((member) => (
+                                    <div key={member.id} 
+                                         className="p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                                      <div className="flex items-center gap-4">
+                                        <Checkbox
+                                          checked={selectedMembers.find(m => m.id === member.id)?.selected}
+                                          onCheckedChange={(checked: boolean) => {
+                                            setSelectedMembers(prev => 
+                                              prev.map(m => 
+                                                m.id === member.id 
+                                                  ? { ...m, selected: checked }
+                                                  : m
+                                              )
+                                            );
+                                          }}
+                                        />
+                                        <span className="font-medium">{member.name}</span>
                                       </div>
-                                    )}
-                                  </div>
-                                ))}
+
+                                      {selectedMembers.find(m => m.id === member.id)?.selected && (
+                                        <div className="mt-4 grid grid-cols-3 gap-4">
+                                          <div className="space-y-2">
+                                            <label className="text-sm text-gray-600">Buy-in Amount</label>
+                                            <Input
+                                              type="number"
+                                              min={sessionDetails.tableSettings.minBuyIn}
+                                              max={sessionDetails.tableSettings.maxBuyIn}
+                                              value={buyIns[member.id] || ""}
+                                              onChange={(e) => setBuyIns(prev => ({
+                                                ...prev,
+                                                [member.id]: e.target.value
+                                              }))}
+                                              className="bg-white"
+                                            />
+                                          </div>
+                                          
+                                          <div className="space-y-2">
+                                            <label className="text-sm text-gray-600">Start Time</label>
+                                            <Input
+                                              type="time"
+                                              value={playerSessions[member.id]?.startTime || ""}
+                                              onChange={(e) => setPlayerSessions(prev => ({
+                                                ...prev,
+                                                [member.id]: {
+                                                  ...prev[member.id],
+                                                  startTime: e.target.value
+                                                }
+                                              }))}
+                                              className="bg-white"
+                                            />
+                                          </div>
+
+                                          <div className="space-y-2">
+                                            <label className="text-sm text-gray-600">End Time</label>
+                                            <Input
+                                              type="time"
+                                              value={playerSessions[member.id]?.endTime || ""}
+                                              onChange={(e) => setPlayerSessions(prev => ({
+                                                ...prev,
+                                                [member.id]: {
+                                                  ...prev[member.id],
+                                                  endTime: e.target.value
+                                                }
+                                              }))}
+                                              className="bg-white"
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
 
-                              <Button 
-                                type="submit" 
-                                className="w-full"
-                                disabled={!sessionDetails.gameType || !sessionDetails.buyIn}
-                              >
-                                Start Session
-                              </Button>
+                              {/* Notes Section */}
+                              <div className="space-y-1">
+                                <label className="text-sm font-medium">Session Notes</label>
+                                <textarea
+                                  className="w-full rounded-lg border p-2 text-sm min-h-[60px] bg-white"
+                                  placeholder="Add any notes about the session..."
+                                  value={sessionDetails.notes}
+                                  onChange={(e) => 
+                                    setSessionDetails(prev => ({ ...prev, notes: e.target.value }))
+                                  }
+                                />
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-3 pt-3 border-t">
+                                <Button 
+                                  type="button"
+                                  variant="outline"
+                                  className="flex-1 h-8 text-sm"
+                                  onClick={() => {
+                                    // Reset form
+                                    setSessionDetails({
+                                      gameType: "",
+                                      location: "",
+                                      tableSettings: {
+                                        blinds: "",
+                                        minBuyIn: 0,
+                                        maxBuyIn: 0,
+                                        rake: 0
+                                      },
+                                      notes: ""
+                                    });
+                                    setSelectedMembers(mockLeaderboard.map(m => ({ ...m, selected: false })));
+                                    setBuyIns({});
+                                    setPlayerSessions({});
+                                  }}
+                                >
+                                  Reset
+                                </Button>
+                                <Button 
+                                  type="submit" 
+                                  className="flex-1 h-8 text-sm"
+                                  disabled={!sessionDetails.gameType || selectedMembers.filter(m => m.selected).length === 0}
+                                >
+                                  Start Session
+                                </Button>
+                              </div>
                             </form>
                           </DialogContent>
                         </Dialog>
@@ -877,6 +1032,50 @@ export default function PokerTracker() {
                           ))}
                         </div>
                       </div>
+                    )}
+
+                    {/* Active Session */}
+                    {activeSession && (
+                      <Card className="mt-4 border-blue-200 bg-blue-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <div>
+                              <h3 className="font-medium text-blue-800">Active Session</h3>
+                              <p className="text-sm text-blue-600">{activeSession.gameType}</p>
+                            </div>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setActiveSession(null);
+                                setPlayerSessions(prev => 
+                                  Object.fromEntries(
+                                    Object.entries(prev).map(([id, session]) => [
+                                      id,
+                                      { ...session, isActive: false, endTime: formatTime(new Date()) }
+                                    ])
+                                  )
+                                );
+                              }}
+                            >
+                              End Session
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            {Object.values(playerSessions)
+                              .filter(player => player.isActive)
+                              .map(player => (
+                                <div key={player.memberId} className="flex justify-between items-center p-2 bg-white rounded">
+                                  <span>{player.name}</span>
+                                  <span className="text-sm text-gray-600">
+                                    Started: {player.startTime}
+                                  </span>
+                                </div>
+                              ))
+                            }
+                          </div>
+                        </CardContent>
+                      </Card>
                     )}
                   </CardContent>
                 </Card>
