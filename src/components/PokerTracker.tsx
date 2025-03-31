@@ -276,17 +276,6 @@ const GTO_SB: GTOChart = {
   "22": "Limp"
 } as const;
 
-// Then define the GTO_CHART with proper typing
-const GTO_CHART: { [key: string]: GTOChart } = {
-  SB: GTO_SB,
-  BTN: {
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    // Add more hands for BTN...
-  },
-  // Add other positions...
-} as const;
-
 export default function PokerTracker() {
   const [view, setView] = useState<ViewType>("Week");
   const [activeSegment, setActiveSegment] = useState<SegmentType>("Overview");
@@ -537,14 +526,10 @@ export default function PokerTracker() {
     console.log("Normalized Hand:", normalizedHand); // Debug log
     console.log("Selected Position:", selectedPosition); // Debug log
     
-    const chart = GTO_CHART[selectedPosition];
-    if (chart && normalizedHand) {
-      const action = chart[normalizedHand];
-      console.log("Found Action:", action); // Debug log
-      setGtoMove(action || "");
-    } else {
-      setGtoMove("");
-    }
+    // Use GTO_SB chart for all positions
+    const action = GTO_SB[normalizedHand];
+    console.log("Found Action:", action); // Debug log
+    setGtoMove(action || "");
   };
 
   // Update the normalizeToGTO function to be more robust
@@ -1391,6 +1376,9 @@ export default function PokerTracker() {
                             Hand: {selectedCard1?.display}{selectedCard2?.display} ({normalizeToGTO(selectedCard1, selectedCard2)})
                           </p>
                           <p className="text-lg">Recommended Action: {gtoMove}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            *Using Small Blind GTO ranges as reference
+                          </p>
                         </div>
                       )}
                     </div>
