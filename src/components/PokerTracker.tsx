@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock, Calendar } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from '../lib/supabase';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Checkbox } from "./ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Input } from "./ui/input";
 
 type ViewType = "Day" | "Week" | "Month";
 type SegmentType = "Overview" | "Session" | "Cost" | "Community";
@@ -59,6 +63,21 @@ interface LeaderboardMember {
   avatar?: string;
 }
 
+interface GroupMember extends LeaderboardMember {
+  selected?: boolean;
+}
+
+interface GameSession {
+  id: string;
+  date: string;
+  gameType: string;
+  players: {
+    memberId: number;
+    buyIns: number;
+    duration: number;
+  }[];
+}
+
 export default function PokerTracker() {
   const [view, setView] = useState<ViewType>("Week");
   const [activeSegment, setActiveSegment] = useState<SegmentType>("Overview");
@@ -75,6 +94,12 @@ export default function PokerTracker() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [emailList, setEmailList] = useState<EmailSubmission[]>([]);
+  const [showNewSessionModal, setShowNewSessionModal] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<GroupMember[]>([]);
+  const [sessions, setSessions] = useState<GameSession[]>([]);
+  const [buyIns, setBuyIns] = useState<Record<number, string>>({});
+  const [duration, setDuration] = useState<Record<number, string>>({});
+  const [selectedGameType, setSelectedGameType] = useState("");
 
   // Update email list fetching
   useEffect(() => {
@@ -231,6 +256,36 @@ export default function PokerTracker() {
       hoursPlayed: 38,
     }
   ];
+
+  const gameTypes = [
+    "Texas Hold'em",
+    "Omaha",
+    "Seven Card Stud",
+    "Short Deck",
+  ];
+
+  const handleCreateSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newSession: GameSession = {
+      id: Math.random().toString(36).substr(2, 9),
+      date: new Date().toISOString(),
+      gameType: selectedGameType,
+      players: selectedMembers
+        .filter(member => member.selected)
+        .map(member => ({
+          memberId: member.id,
+          buyIns: Number(buyIns[member.id] || 1),
+          duration: Number(duration[member.id] || 0),
+        }))
+    };
+    setSessions([newSession, ...sessions]);
+    setShowNewSessionModal(false);
+    // Reset form
+    setSelectedMembers(mockLeaderboard);
+    setBuyIns({});
+    setDuration({});
+    setSelectedGameType("");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -541,6 +596,98 @@ export default function PokerTracker() {
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-2xl font-bold text-blue-600">NYU</h3>
                       <div className="flex gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="default" size="sm">
+                              <Plus className="h-4 w-4 mr-2" />
+                              New Session
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Create New Session</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleCreateSession} className="space-y-6">
+                              {/* Game Type Selection */}
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Game Type</label>
+                                <Select
+                                  value={selectedGameType}
+                                  onValueChange={setSelectedGameType}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select game type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {gameTypes.map((game) => (
+                                      <SelectItem key={game} value={game}>
+                                        {game}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {/* Member Selection */}
+                              <div className="space-y-4">
+                                <label className="text-sm font-medium">Select Players</label>
+                                {mockLeaderboard.map((member) => (
+                                  <div key={member.id} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                                    <Checkbox
+                                      checked={selectedMembers.find(m => m.id === member.id)?.selected}
+                                      onCheckedChange={(checked: boolean) => {
+                                        setSelectedMembers(prev => 
+                                          prev.map(m => 
+                                            m.id === member.id 
+                                              ? { ...m, selected: checked }
+                                              : m
+                                          )
+                                        );
+                                      }}
+                                    />
+                                    <span>{member.name}</span>
+                                    
+                                    {selectedMembers.find(m => m.id === member.id)?.selected && (
+                                      <div className="flex gap-4 ml-auto">
+                                        <div className="flex items-center gap-2">
+                                          <label className="text-sm">Buy-ins:</label>
+                                          <Input
+                                            type="number"
+                                            min="1"
+                                            value={buyIns[member.id] || ""}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBuyIns(prev => ({
+                                              ...prev,
+                                              [member.id]: e.target.value
+                                            }))}
+                                            className="w-20"
+                                          />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <label className="text-sm">Duration (hrs):</label>
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.5"
+                                            value={duration[member.id] || ""}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDuration(prev => ({
+                                              ...prev,
+                                              [member.id]: e.target.value
+                                            }))}
+                                            className="w-20"
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+
+                              <Button type="submit" className="w-full">
+                                Start Session
+                              </Button>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
                         <Button variant="outline" size="sm">
                           <Users className="h-4 w-4 mr-2" />
                           Members
@@ -602,6 +749,35 @@ export default function PokerTracker() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Recent Sessions */}
+                    {sessions.length > 0 && (
+                      <div className="mt-8 space-y-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-5 w-5 text-blue-500" />
+                          <h4 className="text-lg font-semibold">Recent Sessions</h4>
+                        </div>
+                        <div className="space-y-3">
+                          {sessions.map((session) => (
+                            <Card key={session.id}>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p className="font-medium">{session.gameType}</p>
+                                    <p className="text-sm text-gray-500">
+                                      {new Date(session.date).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  <div className="text-sm text-gray-600">
+                                    {session.players.length} players
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
