@@ -154,284 +154,6 @@ type GTOChart = {
   [key: string]: Action;
 };
 
-// Update the state definition
-const [gtoMove, setGtoMove] = useState<Action>("");
-
-// Update the handler
-const handleCheckGTO = useCallback(() => {
-  if (!selectedCard1 || !selectedCard2) {
-    alert("Please select both cards");
-    return;
-  }
-  
-  const normalizedHand = normalizeToGTO(selectedCard1, selectedCard2);
-  console.log("Normalized Hand:", normalizedHand);
-  console.log("Selected Position:", selectedPosition);
-  
-  const positionChart = GTO_CHARTS[selectedPosition];
-  const action = positionChart[normalizedHand as keyof typeof positionChart] || positionChart["*"];
-  console.log("Found Action:", action);
-  
-  setGtoMove(action as Action);
-}, [selectedCard1, selectedCard2, selectedPosition, normalizeToGTO]);
-
-// Update the getActionColor function to handle all actions
-const getActionColor = (action: Action) => {
-  switch (action) {
-    case "Raise/Call 3-bet":
-      return "bg-green-100 text-green-800";
-    case "Jam":
-      return "bg-purple-100 text-purple-800";
-    case "Raise/Jam":
-      return "bg-orange-100 text-orange-800";
-    case "Raise/Fold":
-      return "bg-blue-100 text-blue-800";
-    case "Limp":
-      return "bg-yellow-100 text-yellow-800";
-    case "Call":
-      return "bg-cyan-100 text-cyan-800";
-    case "Fold":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-// Define the GTO_SB chart
-const GTO_SB: GTOChart = {
-  // Premium hands
-  "AA": "Raise/Call 3-bet",
-  "KK": "Raise/Call 3-bet",
-  "QQ": "Raise/Call 3-bet",
-  "JJ": "Raise/Call 3-bet",
-  "TT": "Raise/Call 3-bet",
-  "99": "Raise/Call 3-bet",
-  "88": "Raise/Call 3-bet",
-  
-  // Strong Aces suited
-  "AKs": "Raise/Call 3-bet",
-  "AQs": "Raise/Call 3-bet",
-  "AJs": "Raise/Call 3-bet",
-  "ATs": "Raise/Call 3-bet",
-  "A9s": "Raise/Call 3-bet",
-  "A8s": "Raise/Call 3-bet",
-  "A7s": "Raise/Call 3-bet",
-  "A6s": "Raise/Call 3-bet",
-  "A5s": "Raise/Call 3-bet",
-  "A4s": "Raise/Call 3-bet",
-  "A3s": "Raise/Call 3-bet",
-  "A2s": "Raise/Call 3-bet",
-
-  // Strong Aces offsuit
-  "AKo": "Raise/Call 3-bet",
-  "AQo": "Raise/Call 3-bet",
-  "AJo": "Raise/Call 3-bet",
-  "ATo": "Raise/Call 3-bet",
-  
-  // Strong Broadway
-  "KQo": "Raise/Call 3-bet",
-  "KJo": "Raise/Call 3-bet",
-  "QJo": "Raise/Call 3-bet",
-
-  // Jam hands
-  "A9o": "Jam",
-  "33": "Jam",
-
-  // Raise/Jam hands
-  "K9o": "Raise/Jam",
-  "Q9o": "Raise/Jam",
-  "J9o": "Raise/Jam",
-  "T9o": "Raise/Jam",
-  "98o": "Raise/Jam",
-  "97o": "Raise/Jam",
-  "87o": "Raise/Jam",
-  "76o": "Raise/Jam",
-  "65o": "Raise/Jam",
-  "K9s": "Raise/Jam",
-  "K8s": "Raise/Jam",
-  "Q8s": "Raise/Jam",
-  "J8s": "Raise/Jam",
-  "T8s": "Raise/Jam",
-  "95s": "Raise/Jam",
-  "85s": "Raise/Jam",
-  "74s": "Raise/Jam",
-  "64s": "Raise/Jam",
-  "53s": "Raise/Jam",
-  "43s": "Raise/Jam",
-
-  // Raise/Fold hands
-  "A8o": "Raise/Fold",
-  "A7o": "Raise/Fold",
-  "A6o": "Raise/Fold",
-  "A5o": "Raise/Fold",
-  "A4o": "Raise/Fold",
-  "A3o": "Raise/Fold",
-  "A2o": "Raise/Fold",
-  "K7o": "Raise/Fold",
-  "K6o": "Raise/Fold",
-  "K5o": "Raise/Fold",
-  "K4o": "Raise/Fold",
-  "K3o": "Raise/Fold",
-  "K2o": "Raise/Fold",
-  "Q8o": "Raise/Fold",
-  "Q7o": "Raise/Fold",
-  "Q6o": "Raise/Fold",
-  "Q5o": "Raise/Fold",
-  "Q4o": "Raise/Fold",
-  "Q3o": "Raise/Fold",
-  "Q2o": "Raise/Fold",
-
-  // Limp hands
-  "K7s": "Limp",
-  "K6s": "Limp",
-  "K5s": "Limp",
-  "K4s": "Limp",
-  "K3s": "Limp",
-  "K2s": "Limp",
-  "Q7s": "Limp",
-  "Q6s": "Limp",
-  "Q5s": "Limp",
-  "Q4s": "Limp",
-  "Q3s": "Limp",
-  "Q2s": "Limp",
-  "J7s": "Limp",
-  "J6s": "Limp",
-  "J5s": "Limp",
-  "J4s": "Limp",
-  "J3s": "Limp",
-  "J2s": "Limp",
-  "T7s": "Limp",
-  "T6s": "Limp",
-  "T5s": "Limp",
-  "T4s": "Limp",
-  "T3s": "Limp",
-  "T2s": "Limp",
-  "22": "Limp"
-} as const;
-
-// Define position-specific GTO charts
-const GTO_CHARTS = {
-  UTG: {
-    // Premium hands
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    "QQ": "Raise/Call 3-bet",
-    "JJ": "Raise/Call 3-bet",
-    "TT": "Raise/Call 3-bet",
-    "AKs": "Raise/Call 3-bet",
-    "AQs": "Raise/Call 3-bet",
-    "AKo": "Raise/Call 3-bet",
-    // Medium strength
-    "99": "Raise/Fold",
-    "88": "Raise/Fold",
-    "AJs": "Raise/Fold",
-    "ATs": "Raise/Fold",
-    "KQs": "Raise/Fold",
-    // Everything else
-    "*": "Fold"
-  },
-  MP: {
-    // Premium hands
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    "QQ": "Raise/Call 3-bet",
-    "JJ": "Raise/Call 3-bet",
-    "TT": "Raise/Call 3-bet",
-    "99": "Raise/Call 3-bet",
-    "AKs": "Raise/Call 3-bet",
-    "AQs": "Raise/Call 3-bet",
-    "AJs": "Raise/Call 3-bet",
-    "AKo": "Raise/Call 3-bet",
-    // Medium strength
-    "88": "Raise/Fold",
-    "77": "Raise/Fold",
-    "ATs": "Raise/Fold",
-    "KQs": "Raise/Fold",
-    "KJs": "Raise/Fold",
-    // Everything else
-    "*": "Fold"
-  },
-  CO: {
-    // Premium hands
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    "QQ": "Raise/Call 3-bet",
-    "JJ": "Raise/Call 3-bet",
-    "TT": "Raise/Call 3-bet",
-    "99": "Raise/Call 3-bet",
-    "AKs": "Raise/Call 3-bet",
-    "AQs": "Raise/Call 3-bet",
-    "AJs": "Raise/Call 3-bet",
-    "AKo": "Raise/Call 3-bet",
-    "AQo": "Raise/Call 3-bet",
-    // Medium strength
-    "88": "Raise/Fold",
-    "77": "Raise/Fold",
-    "66": "Raise/Fold",
-    "ATs": "Raise/Fold",
-    "KQs": "Raise/Fold",
-    "KJs": "Raise/Fold",
-    "QJs": "Raise/Fold",
-    // Everything else
-    "*": "Fold"
-  },
-  BTN: {
-    // Premium hands
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    "QQ": "Raise/Call 3-bet",
-    "JJ": "Raise/Call 3-bet",
-    "TT": "Raise/Call 3-bet",
-    "99": "Raise/Call 3-bet",
-    "88": "Raise/Call 3-bet",
-    "AKs": "Raise/Call 3-bet",
-    "AQs": "Raise/Call 3-bet",
-    "AJs": "Raise/Call 3-bet",
-    "ATs": "Raise/Call 3-bet",
-    "KQs": "Raise/Call 3-bet",
-    "AKo": "Raise/Call 3-bet",
-    "AQo": "Raise/Call 3-bet",
-    // Medium strength
-    "77": "Raise/Fold",
-    "66": "Raise/Fold",
-    "55": "Raise/Fold",
-    "A9s": "Raise/Fold",
-    "A8s": "Raise/Fold",
-    "KJs": "Raise/Fold",
-    "QJs": "Raise/Fold",
-    "JTs": "Raise/Fold",
-    // Everything else
-    "*": "Fold"
-  },
-  SB: GTO_SB, // Use existing SB chart
-  BB: {
-    // Premium hands
-    "AA": "Raise/Call 3-bet",
-    "KK": "Raise/Call 3-bet",
-    "QQ": "Raise/Call 3-bet",
-    "JJ": "Raise/Call 3-bet",
-    "TT": "Raise/Call 3-bet",
-    "99": "Raise/Call 3-bet",
-    "AKs": "Raise/Call 3-bet",
-    "AQs": "Raise/Call 3-bet",
-    "AJs": "Raise/Call 3-bet",
-    "AKo": "Raise/Call 3-bet",
-    // Defense hands
-    "88": "Call",
-    "77": "Call",
-    "66": "Call",
-    "55": "Call",
-    "44": "Call",
-    "33": "Call",
-    "22": "Call",
-    "ATs": "Call",
-    "KQs": "Call",
-    "KJs": "Call",
-    // Everything else
-    "*": "Fold"
-  }
-} as const;
-
 export default function PokerTracker() {
   const [view, setView] = useState<ViewType>("Week");
   const [activeSegment, setActiveSegment] = useState<SegmentType>("Overview");
@@ -471,6 +193,7 @@ export default function PokerTracker() {
   const [selectedCard2, setSelectedCard2] = useState<Card | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<Position>("UTG");
   const [showDetails, setShowDetails] = useState(false);
+  const [gtoMove, setGtoMove] = useState<Action>("");
 
   // Update email list fetching
   useEffect(() => {
@@ -671,7 +394,7 @@ export default function PokerTracker() {
     setSelectedGameType("");
   };
 
-  // Enhanced normalizeToGTO function
+  // Define the normalizeToGTO function within the component
   const normalizeToGTO = useCallback((card1: Card | null, card2: Card | null): string => {
     if (!card1 || !card2) return "";
 
@@ -690,6 +413,281 @@ export default function PokerTracker() {
     const suffix = highCard.suit === lowCard.suit ? "s" : "o";
     return highCard.rank + lowCard.rank + suffix;
   }, []);
+
+  // Define the handleCheckGTO function within the component
+  const handleCheckGTO = useCallback(() => {
+    if (!selectedCard1 || !selectedCard2) {
+      alert("Please select both cards");
+      return;
+    }
+    
+    const normalizedHand = normalizeToGTO(selectedCard1, selectedCard2);
+    console.log("Normalized Hand:", normalizedHand);
+    console.log("Selected Position:", selectedPosition);
+    
+    const positionChart = GTO_CHARTS[selectedPosition];
+    const action = positionChart[normalizedHand as keyof typeof positionChart] || positionChart["*"];
+    console.log("Found Action:", action);
+    
+    setGtoMove(action as Action);
+  }, [selectedCard1, selectedCard2, selectedPosition, normalizeToGTO]);
+
+  // Update the getActionColor function to handle all actions
+  const getActionColor = (action: Action) => {
+    switch (action) {
+      case "Raise/Call 3-bet":
+        return "bg-green-100 text-green-800";
+      case "Jam":
+        return "bg-purple-100 text-purple-800";
+      case "Raise/Jam":
+        return "bg-orange-100 text-orange-800";
+      case "Raise/Fold":
+        return "bg-blue-100 text-blue-800";
+      case "Limp":
+        return "bg-yellow-100 text-yellow-800";
+      case "Call":
+        return "bg-cyan-100 text-cyan-800";
+      case "Fold":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Define the GTO_SB chart
+  const GTO_SB: GTOChart = {
+    // Premium hands
+    "AA": "Raise/Call 3-bet",
+    "KK": "Raise/Call 3-bet",
+    "QQ": "Raise/Call 3-bet",
+    "JJ": "Raise/Call 3-bet",
+    "TT": "Raise/Call 3-bet",
+    "99": "Raise/Call 3-bet",
+    "88": "Raise/Call 3-bet",
+    
+    // Strong Aces suited
+    "AKs": "Raise/Call 3-bet",
+    "AQs": "Raise/Call 3-bet",
+    "AJs": "Raise/Call 3-bet",
+    "ATs": "Raise/Call 3-bet",
+    "A9s": "Raise/Call 3-bet",
+    "A8s": "Raise/Call 3-bet",
+    "A7s": "Raise/Call 3-bet",
+    "A6s": "Raise/Call 3-bet",
+    "A5s": "Raise/Call 3-bet",
+    "A4s": "Raise/Call 3-bet",
+    "A3s": "Raise/Call 3-bet",
+    "A2s": "Raise/Call 3-bet",
+
+    // Strong Aces offsuit
+    "AKo": "Raise/Call 3-bet",
+    "AQo": "Raise/Call 3-bet",
+    "AJo": "Raise/Call 3-bet",
+    "ATo": "Raise/Call 3-bet",
+    
+    // Strong Broadway
+    "KQo": "Raise/Call 3-bet",
+    "KJo": "Raise/Call 3-bet",
+    "QJo": "Raise/Call 3-bet",
+
+    // Jam hands
+    "A9o": "Jam",
+    "33": "Jam",
+
+    // Raise/Jam hands
+    "K9o": "Raise/Jam",
+    "Q9o": "Raise/Jam",
+    "J9o": "Raise/Jam",
+    "T9o": "Raise/Jam",
+    "98o": "Raise/Jam",
+    "97o": "Raise/Jam",
+    "87o": "Raise/Jam",
+    "76o": "Raise/Jam",
+    "65o": "Raise/Jam",
+    "K9s": "Raise/Jam",
+    "K8s": "Raise/Jam",
+    "Q8s": "Raise/Jam",
+    "J8s": "Raise/Jam",
+    "T8s": "Raise/Jam",
+    "95s": "Raise/Jam",
+    "85s": "Raise/Jam",
+    "74s": "Raise/Jam",
+    "64s": "Raise/Jam",
+    "53s": "Raise/Jam",
+    "43s": "Raise/Jam",
+
+    // Raise/Fold hands
+    "A8o": "Raise/Fold",
+    "A7o": "Raise/Fold",
+    "A6o": "Raise/Fold",
+    "A5o": "Raise/Fold",
+    "A4o": "Raise/Fold",
+    "A3o": "Raise/Fold",
+    "A2o": "Raise/Fold",
+    "K7o": "Raise/Fold",
+    "K6o": "Raise/Fold",
+    "K5o": "Raise/Fold",
+    "K4o": "Raise/Fold",
+    "K3o": "Raise/Fold",
+    "K2o": "Raise/Fold",
+    "Q8o": "Raise/Fold",
+    "Q7o": "Raise/Fold",
+    "Q6o": "Raise/Fold",
+    "Q5o": "Raise/Fold",
+    "Q4o": "Raise/Fold",
+    "Q3o": "Raise/Fold",
+    "Q2o": "Raise/Fold",
+
+    // Limp hands
+    "K7s": "Limp",
+    "K6s": "Limp",
+    "K5s": "Limp",
+    "K4s": "Limp",
+    "K3s": "Limp",
+    "K2s": "Limp",
+    "Q7s": "Limp",
+    "Q6s": "Limp",
+    "Q5s": "Limp",
+    "Q4s": "Limp",
+    "Q3s": "Limp",
+    "Q2s": "Limp",
+    "J7s": "Limp",
+    "J6s": "Limp",
+    "J5s": "Limp",
+    "J4s": "Limp",
+    "J3s": "Limp",
+    "J2s": "Limp",
+    "T7s": "Limp",
+    "T6s": "Limp",
+    "T5s": "Limp",
+    "T4s": "Limp",
+    "T3s": "Limp",
+    "T2s": "Limp",
+    "22": "Limp"
+  } as const;
+
+  // Define position-specific GTO charts
+  const GTO_CHARTS = {
+    UTG: {
+      // Premium hands
+      "AA": "Raise/Call 3-bet",
+      "KK": "Raise/Call 3-bet",
+      "QQ": "Raise/Call 3-bet",
+      "JJ": "Raise/Call 3-bet",
+      "TT": "Raise/Call 3-bet",
+      "AKs": "Raise/Call 3-bet",
+      "AQs": "Raise/Call 3-bet",
+      "AKo": "Raise/Call 3-bet",
+      // Medium strength
+      "99": "Raise/Fold",
+      "88": "Raise/Fold",
+      "AJs": "Raise/Fold",
+      "ATs": "Raise/Fold",
+      "KQs": "Raise/Fold",
+      // Everything else
+      "*": "Fold"
+    },
+    MP: {
+      // Premium hands
+      "AA": "Raise/Call 3-bet",
+      "KK": "Raise/Call 3-bet",
+      "QQ": "Raise/Call 3-bet",
+      "JJ": "Raise/Call 3-bet",
+      "TT": "Raise/Call 3-bet",
+      "99": "Raise/Call 3-bet",
+      "AKs": "Raise/Call 3-bet",
+      "AQs": "Raise/Call 3-bet",
+      "AJs": "Raise/Call 3-bet",
+      "AKo": "Raise/Call 3-bet",
+      // Medium strength
+      "88": "Raise/Fold",
+      "77": "Raise/Fold",
+      "ATs": "Raise/Fold",
+      "KQs": "Raise/Fold",
+      "KJs": "Raise/Fold",
+      // Everything else
+      "*": "Fold"
+    },
+    CO: {
+      // Premium hands
+      "AA": "Raise/Call 3-bet",
+      "KK": "Raise/Call 3-bet",
+      "QQ": "Raise/Call 3-bet",
+      "JJ": "Raise/Call 3-bet",
+      "TT": "Raise/Call 3-bet",
+      "99": "Raise/Call 3-bet",
+      "AKs": "Raise/Call 3-bet",
+      "AQs": "Raise/Call 3-bet",
+      "AJs": "Raise/Call 3-bet",
+      "AKo": "Raise/Call 3-bet",
+      "AQo": "Raise/Call 3-bet",
+      // Medium strength
+      "88": "Raise/Fold",
+      "77": "Raise/Fold",
+      "66": "Raise/Fold",
+      "ATs": "Raise/Fold",
+      "KQs": "Raise/Fold",
+      "KJs": "Raise/Fold",
+      "QJs": "Raise/Fold",
+      // Everything else
+      "*": "Fold"
+    },
+    BTN: {
+      // Premium hands
+      "AA": "Raise/Call 3-bet",
+      "KK": "Raise/Call 3-bet",
+      "QQ": "Raise/Call 3-bet",
+      "JJ": "Raise/Call 3-bet",
+      "TT": "Raise/Call 3-bet",
+      "99": "Raise/Call 3-bet",
+      "88": "Raise/Call 3-bet",
+      "AKs": "Raise/Call 3-bet",
+      "AQs": "Raise/Call 3-bet",
+      "AJs": "Raise/Call 3-bet",
+      "ATs": "Raise/Call 3-bet",
+      "KQs": "Raise/Call 3-bet",
+      "AKo": "Raise/Call 3-bet",
+      "AQo": "Raise/Call 3-bet",
+      // Medium strength
+      "77": "Raise/Fold",
+      "66": "Raise/Fold",
+      "55": "Raise/Fold",
+      "A9s": "Raise/Fold",
+      "A8s": "Raise/Fold",
+      "KJs": "Raise/Fold",
+      "QJs": "Raise/Fold",
+      "JTs": "Raise/Fold",
+      // Everything else
+      "*": "Fold"
+    },
+    SB: GTO_SB, // Use existing SB chart
+    BB: {
+      // Premium hands
+      "AA": "Raise/Call 3-bet",
+      "KK": "Raise/Call 3-bet",
+      "QQ": "Raise/Call 3-bet",
+      "JJ": "Raise/Call 3-bet",
+      "TT": "Raise/Call 3-bet",
+      "99": "Raise/Call 3-bet",
+      "AKs": "Raise/Call 3-bet",
+      "AQs": "Raise/Call 3-bet",
+      "AJs": "Raise/Call 3-bet",
+      "AKo": "Raise/Call 3-bet",
+      // Defense hands
+      "88": "Call",
+      "77": "Call",
+      "66": "Call",
+      "55": "Call",
+      "44": "Call",
+      "33": "Call",
+      "22": "Call",
+      "ATs": "Call",
+      "KQs": "Call",
+      "KJs": "Call",
+      // Everything else
+      "*": "Fold"
+    }
+  } as const;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
