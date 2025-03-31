@@ -7,7 +7,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { supabase } from '../lib/supabase';
 
 type ViewType = "Day" | "Week" | "Month";
-type SegmentType = "Overview" | "Session" | "Cost";
+type SegmentType = "Overview" | "Session" | "Cost" | "Community";
 
 interface PokerStats {
   winnings: number;
@@ -173,7 +173,7 @@ export default function PokerTracker() {
     };
   };
 
-  const segments: SegmentType[] = ["Overview", "Session", "Cost"];
+  const segments: SegmentType[] = ["Overview", "Session", "Cost", "Community"];
 
   // Calculate net profit
   const netProfit = data.winnings - data.losses;
@@ -481,6 +481,51 @@ export default function PokerTracker() {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeSegment === "Community" && (
+              <div className="space-y-6">
+                {/* Community Content */}
+                <div className="space-y-4">
+                  <Card className="border border-gray-200">
+                    <CardContent className="p-4">
+                      <h3 className="text-lg font-semibold text-blue-600 mb-2">Community Hub</h3>
+                      <p className="text-gray-600 mb-4">Connect with fellow poker players and share strategies.</p>
+                      
+                      {/* Placeholder Community Features */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <Card className="border border-gray-200">
+                          <CardContent className="p-3">
+                            <h4 className="font-medium">Discussion Forums</h4>
+                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="border border-gray-200">
+                          <CardContent className="p-3">
+                            <h4 className="font-medium">Strategy Groups</h4>
+                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="border border-gray-200">
+                          <CardContent className="p-3">
+                            <h4 className="font-medium">Live Events</h4>
+                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="border border-gray-200">
+                          <CardContent className="p-3">
+                            <h4 className="font-medium">Player Rankings</h4>
+                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             )}
