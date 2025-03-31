@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from '../lib/supabase';
@@ -48,6 +48,15 @@ interface EmailRecord {
 interface EmailSubmission {
   email: string;
   timestamp: string;
+}
+
+interface LeaderboardMember {
+  id: number;
+  name: string;
+  netProfit: number;
+  profitPerHour: number;
+  hoursPlayed: number;
+  avatar?: string;
 }
 
 export default function PokerTracker() {
@@ -182,6 +191,46 @@ export default function PokerTracker() {
     : "0";
 
   const opportunityCost = calculateOpportunityCost();
+
+  const mockLeaderboard: LeaderboardMember[] = [
+    {
+      id: 1,
+      name: "Veer Kapur",
+      netProfit: 2450,
+      profitPerHour: 35.8,
+      hoursPlayed: 68,
+      avatar: "/avatars/veer.jpg" // Optional: Add actual avatar paths if you have them
+    },
+    {
+      id: 2,
+      name: "Yuvraj Nahar",
+      netProfit: 1890,
+      profitPerHour: 31.5,
+      hoursPlayed: 60,
+    },
+    {
+      id: 3,
+      name: "Ranai Loonkar",
+      netProfit: 1560,
+      profitPerHour: 28.9,
+      hoursPlayed: 54,
+      avatar: "/avatars/ranai.jpg"
+    },
+    {
+      id: 4,
+      name: "Abhiviraj Goel",
+      netProfit: 980,
+      profitPerHour: 22.3,
+      hoursPlayed: 44,
+    },
+    {
+      id: 5,
+      name: "Aarav Shah",
+      netProfit: 750,
+      profitPerHour: 19.7,
+      hoursPlayed: 38,
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -487,46 +536,74 @@ export default function PokerTracker() {
 
             {activeSegment === "Community" && (
               <div className="space-y-6">
-                {/* Community Content */}
-                <div className="space-y-4">
-                  <Card className="border border-gray-200">
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold text-blue-600 mb-2">Community Hub</h3>
-                      <p className="text-gray-600 mb-4">Connect with fellow poker players and share strategies.</p>
-                      
-                      {/* Placeholder Community Features */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <Card className="border border-gray-200">
-                          <CardContent className="p-3">
-                            <h4 className="font-medium">Discussion Forums</h4>
-                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
-                          </CardContent>
-                        </Card>
-                        
-                        <Card className="border border-gray-200">
-                          <CardContent className="p-3">
-                            <h4 className="font-medium">Strategy Groups</h4>
-                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
-                          </CardContent>
-                        </Card>
-                        
-                        <Card className="border border-gray-200">
-                          <CardContent className="p-3">
-                            <h4 className="font-medium">Live Events</h4>
-                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
-                          </CardContent>
-                        </Card>
-                        
-                        <Card className="border border-gray-200">
-                          <CardContent className="p-3">
-                            <h4 className="font-medium">Player Rankings</h4>
-                            <p className="text-sm text-gray-500 mt-1">Coming soon</p>
-                          </CardContent>
-                        </Card>
+                <Card className="border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-2xl font-bold text-blue-600">NYU</h3>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Users className="h-4 w-4 mr-2" />
+                          Members
+                        </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+
+                    {/* Leaderboard */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Trophy className="h-5 w-5 text-yellow-500" />
+                        <h4 className="text-lg font-semibold">Leaderboard</h4>
+                      </div>
+
+                      <div className="space-y-3">
+                        {mockLeaderboard.map((member, index) => (
+                          <div
+                            key={member.id}
+                            className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                          >
+                            {/* Rank and Avatar */}
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg font-semibold text-gray-500 w-6">
+                                {index + 1}.
+                              </span>
+                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                {member.avatar ? (
+                                  <img
+                                    src={member.avatar}
+                                    alt={member.name}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <Users className="h-6 w-6 text-gray-400" />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Member Details */}
+                            <div className="flex-1 grid grid-cols-4 gap-4">
+                              <div>
+                                <p className="font-medium">{member.name}</p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <TrendingUp className="h-4 w-4 text-gray-400" />
+                                <span className={member.netProfit >= 0 ? "text-green-600" : "text-red-600"}>
+                                  ${member.netProfit}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-gray-400" />
+                                <span>${member.profitPerHour}/hr</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">{member.hoursPlayed}h played</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
