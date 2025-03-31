@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Plus, Trash2, Mail, Download, Users, Trophy, TrendingUp, Clock, Calendar, Gamepad2 } from "lucide-react";
@@ -158,7 +158,7 @@ type GTOChart = {
 const [gtoMove, setGtoMove] = useState<Action>("");
 
 // Update the handler
-const handleCheckGTO = () => {
+const handleCheckGTO = useCallback(() => {
   if (!selectedCard1 || !selectedCard2) {
     alert("Please select both cards");
     return;
@@ -173,7 +173,7 @@ const handleCheckGTO = () => {
   console.log("Found Action:", action);
   
   setGtoMove(action as Action);
-};
+}, [selectedCard1, selectedCard2, selectedPosition, normalizeToGTO]);
 
 // Update the getActionColor function to handle all actions
 const getActionColor = (action: Action) => {
@@ -672,7 +672,7 @@ export default function PokerTracker() {
   };
 
   // Enhanced normalizeToGTO function
-  const normalizeToGTO = (card1: Card | null, card2: Card | null): string => {
+  const normalizeToGTO = useCallback((card1: Card | null, card2: Card | null): string => {
     if (!card1 || !card2) return "";
 
     // Sort cards by rank (using the RANKS array for proper order)
@@ -689,7 +689,7 @@ export default function PokerTracker() {
     // Handle suited and offsuit hands
     const suffix = highCard.suit === lowCard.suit ? "s" : "o";
     return highCard.rank + lowCard.rank + suffix;
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -1488,7 +1488,7 @@ export default function PokerTracker() {
                           </SelectTrigger>
                           <SelectContent>
                             {Object.keys(GTO_CHARTS).map((pos) => (
-                              <SelectItem key={pos} value={pos}>
+                              <SelectItem key={pos} value={pos as Position}>
                                 {pos}
                               </SelectItem>
                             ))}
