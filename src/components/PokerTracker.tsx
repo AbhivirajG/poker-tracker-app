@@ -73,6 +73,7 @@ interface GameSession {
   gameType: string;
   players: {
     memberId: number;
+    name: string;
     buyIns: number;
     duration: number;
   }[];
@@ -274,14 +275,15 @@ export default function PokerTracker() {
         .filter(member => member.selected)
         .map(member => ({
           memberId: member.id,
+          name: member.name,
           buyIns: Number(buyIns[member.id] || 1),
           duration: Number(duration[member.id] || 0),
         }))
     };
     setSessions([newSession, ...sessions]);
-    setShowNewSessionModal(false);
+    
     // Reset form
-    setSelectedMembers(mockLeaderboard);
+    setSelectedMembers(prev => prev.map(m => ({ ...m, selected: false })));
     setBuyIns({});
     setDuration({});
     setSelectedGameType("");
@@ -771,6 +773,11 @@ export default function PokerTracker() {
                                   <div className="text-sm text-gray-600">
                                     {session.players.length} players
                                   </div>
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-sm text-gray-500">
+                                    Players: {session.players.map(p => p.name).join(", ")}
+                                  </p>
                                 </div>
                               </CardContent>
                             </Card>
